@@ -15,3 +15,11 @@ python-dateutil==2.8.2
 langdetect==1.0.9
 SpeechRecognition==3.10.4
 pydub==0.25.1
+# Enterprise runtime dependencies
+opentelemetry-api==1.27.0
+opentelemetry-sdk==1.27.0
+opentelemetry-exporter-otlp==1.27.0
+opentelemetry-instrumentation-fastapi==0.48b0
+prometheus-client==0.21.0
+prometheus-fastapi-instrumentator==7.0.0
+redis==5.0.8

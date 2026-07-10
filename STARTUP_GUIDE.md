@@ -4,13 +4,14 @@
 
 ### Prerequisites
 
-1. Python 3.10+ installed
+1. Python 3.11+ installed
 2. Node.js 16+ installed
 3. MongoDB Atlas account (or local MongoDB)
+4. Docker & Docker Compose (for containerized deployment)
 
 ---
 
-## Backend Setup
+## Option 1: Docker Compose (Recommended)
 
 ### 1. Navigate to Backend Directory
 
@@ -18,154 +19,203 @@
 cd backend
 ```
 
-### 2. Create Virtual Environment
+### 2. Configure Environment Variables
 
 ```bash
-python -m venv venv
+cp .env.example .env
 ```
 
-### 3. Activate Virtual Environment
-
-**Windows:**
-```bash
-venv\Scripts\activate
-```
-
-**Mac/Linux:**
-```bash
-source venv/bin/activate
-```
-
-### 4. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 5. Configure Environment Variables
-
-The `.env` file has been created with your MongoDB URI:
-
-```
-MONGODB_URI=mongodb+srv://blackholeinfiverse54_db_user:Gjpl998Z6hsQLjJF@artha.rzneis7.mongodb.net/?appName=Artha
-DATABASE_NAME=mitra_production
-```
-
-**Important:** Update these values in `backend/.env`:
+Edit `backend/.env`:
 
 ```env
-# Required for production
+# Required
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/?appName=Mitra
+DATABASE_NAME=mitra_production
 API_KEY=your_secure_api_key_here
 JWT_SECRET_KEY=your_secure_jwt_secret_here
 
-# Optional: Add at least one LLM provider for AI responses
-# GROQ_API_KEY=your_groq_key
-# OPENAI_API_KEY=your_openai_key
+# Optional: LLM providers
+GROQ_API_KEY=your_groq_key
+OPENAI_API_KEY=your_openai_key
+
+# Optional: Ecosystem products
+UNIGURU_API_URL=https://uniguru.bhiv.example.com/api/v1
+UNIGURU_API_KEY=your_key
 ```
 
-### 6. Start Backend Server
+### 3. Start All Services
 
 ```bash
+docker-compose up -d
+```
+
+This starts 7 services:
+- `mitra-core` - Backend API (port 8000)
+- `mitra-worker` - Background worker
+- `mongodb` - Database (port 27017)
+- `redis` - Cache (port 6379)
+- `prometheus` - Metrics (port 9090)
+- `grafana` - Dashboards (port 3001)
+- `otel-collector` - Tracing (port 4317)
+
+### 4. Verify
+
+```bash
+# Health check
+curl http://localhost:8000/health
+
+# Prometheus
+curl http://localhost:9090
+
+# Grafana (admin/admin)
+open http://localhost:3001
+```
+
+---
+
+## Option 2: Kubernetes
+
+### 1. Apply Manifests
+
+```bash
+cd backend/deploy/kubernetes
+
+kubectl apply -f namespace.yml
+kubectl apply -f configmap.yml
+kubectl apply -f secrets.yml
+kubectl apply -f deployment.yml
+kubectl apply -f service.yml
+kubectl apply -f ingress.yml
+kubectl apply -f network-policy.yml
+```
+
+### 2. Verify
+
+```bash
+kubectl -n mitra get pods
+kubectl -n mitra get services
+```
+
+---
+
+## Option 3: Local Development
+
+### Backend Setup
+
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Mac/Linux
+pip install -r requirements.txt
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-### 7. Verify Backend is Running
-
-Open browser and go to:
-- API Documentation: http://localhost:8000/docs
-- Health Check: http://localhost:8000/health
-- Root Info: http://localhost:8000/
-
----
-
-## Frontend Setup
-
-### 1. Navigate to Frontend Directory
+### Frontend Setup
 
 ```bash
 cd frontend/frontend
-```
-
-### 2. Install Dependencies
-
-```bash
 npm install
-```
-
-### 3. Configure Environment Variables
-
-The `.env` file has been created with:
-
-```
-REACT_APP_API_URL=http://localhost:8000
-REACT_APP_API_KEY=mitra_production_api_key_2026_secure_random_value
-```
-
-**Important:** Make sure the `REACT_APP_API_KEY` matches the `API_KEY` in `backend/.env`
-
-### 4. Start Frontend Server
-
-```bash
 npm start
 ```
 
-### 5. Verify Frontend is Running
+### Verify
 
-Open browser and go to:
+- Backend: http://localhost:8000/docs
 - Frontend: http://localhost:3000
+- Health: http://localhost:8000/health
 
 ---
 
-## MongoDB Connection
+## API Endpoints
 
-Your MongoDB Atlas connection is configured:
+### Core
 
-```env
-MONGODB_URI=mongodb+srv://blackholeinfiverse54_db_user:Gjpl998Z6hsQLjJF@artha.rzneis7.mongodb.net/?appName=Artha
-DATABASE_NAME=mitra_production
-```
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | API info and endpoint listing |
+| `/health` | GET | Health check with MongoDB probe |
+| `/health/system` | GET | Deep system health |
 
-### Verify MongoDB Connection
+### Authentication
 
-1. Start the backend server
-2. Check the health endpoint: http://localhost:8000/health
-3. Look for `"mongodb": "ok"` in the response
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/signup` | POST | User registration |
+| `/api/auth/login` | POST | User login |
+| `/api/auth/me` | GET | Get current user |
+| `/api/auth/logout` | POST | User logout |
 
-### MongoDB Collections
+### Assistant
 
-The following collections will be created automatically:
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/assistant` | POST | Main chat endpoint (V3.0.0) |
+| `/api/mitra/evaluate` | POST | Policy evaluation |
 
-- `users` - User accounts
-- `tasks` - Task records
-- `audit_logs` - Bucket audit trail with trace IDs
+### Ecosystem Integration
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/ecosystem/products` | GET | List BHIV products |
+| `/api/ecosystem/manifests` | GET | Integration manifests |
+| `/api/ecosystem/health` | GET | Integration health |
+| `/api/ecosystem/query` | POST | Query a BHIV product |
+| `/api/ecosystem/execute` | POST | Execute on a BHIV product |
+| `/api/ecosystem/snapshot` | GET | Full registry snapshot |
+
+### Replay & Audit
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/replay/{trace_id}` | POST | Replay a trace |
+| `/api/replay/{trace_id}/stages` | GET | Get trace stages |
+| `/api/replay/compare` | POST | Compare traces |
+
+### Observability
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/metrics` | GET | System metrics |
+| `/api/metrics/system` | GET | Detailed metrics |
+| `/api/metrics/enforcement` | GET | Enforcement metrics |
+| `/metrics` | GET | Prometheus metrics |
+
+### Voice
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/tts` | POST | Text-to-speech |
+| `/api/tts/status` | GET | TTS engine status |
+
+### Webhooks
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/webhooks/whatsapp` | POST | WhatsApp inbound |
+| `/webhooks/telegram` | POST | Telegram inbound |
+| `/webhooks/email` | POST | Email inbound |
+| `/webhooks/instagram` | POST | Instagram inbound |
 
 ---
 
-## Testing the System
+## Testing
 
-### 1. Test Backend API
+### Test Backend API
 
 **Signup:**
 ```bash
 curl -X POST http://localhost:8000/api/auth/signup \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: mitra_production_api_key_2026_secure_random_value" \
+  -H "X-API-Key: your_api_key" \
   -d '{"name": "Test User", "email": "test@example.com", "password": "testpass123"}'
-```
-
-**Login:**
-```bash
-curl -X POST http://localhost:8000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: mitra_production_api_key_2026_secure_random_value" \
-  -d '{"email": "test@example.com", "password": "testpass123"}'
 ```
 
 **Chat:**
 ```bash
 curl -X POST http://localhost:8000/api/assistant \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: mitra_production_api_key_2026_secure_random_value" \
+  -H "X-API-Key: your_api_key" \
   -d '{
     "version": "3.0.0",
     "input": {"message": "Hello, what can you do?"},
@@ -173,87 +223,84 @@ curl -X POST http://localhost:8000/api/assistant \
   }'
 ```
 
-**Mitra Evaluate:**
+**Ecosystem Query:**
 ```bash
-curl -X POST http://localhost:8000/api/mitra/evaluate \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: mitra_production_api_key_2026_secure_random_value" \
-  -d '{
-    "event": {"title": "Test", "content": "This is a test event"},
-    "user_id": "test_user"
-  }'
+curl -X GET http://localhost:8000/api/ecosystem/products \
+  -H "X-API-Key: your_api_key"
 ```
 
-### 2. Test Frontend
-
-1. Open http://localhost:3000
-2. Sign up for a new account
-3. Login with your credentials
-4. Start chatting with the assistant
-
-### 3. Run Tests
+### Load Testing
 
 ```bash
 cd backend
-python -m pytest tests/ -v
+pip install locust
+bash deploy/loadtest/run_loadtest.sh 50 10 60
 ```
 
 ---
 
-## API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | API info and endpoints |
-| `/health` | GET | Health check with MongoDB status |
-| `/health/system` | GET | Deep system health |
-| `/api/auth/signup` | POST | User signup |
-| `/api/auth/login` | POST | User login |
-| `/api/auth/me` | GET | Get current user |
-| `/api/assistant` | POST | Main chat endpoint |
-| `/api/mitra/evaluate` | POST | Policy evaluation |
-| `/api/replay/{trace_id}` | POST | Replay trace |
-| `/api/replay/{trace_id}/stages` | GET | Get trace stages |
-| `/api/replay/compare` | POST | Compare traces |
-| `/api/metrics` | GET | System metrics |
-| `/api/metrics/system` | GET | Detailed metrics |
-| `/api/metrics/enforcement` | GET | Enforcement stats |
-| `/webhooks/whatsapp` | POST | WhatsApp webhook |
-| `/webhooks/telegram` | POST | Telegram webhook |
-| `/webhooks/email` | POST | Email webhook |
-| `/webhooks/instagram` | POST | Instagram webhook |
-
----
-
-## Environment Variables Reference
+## Environment Variables
 
 ### Required
 
-| Variable | Description | Your Value |
-|----------|-------------|------------|
-| `MONGODB_URI` | MongoDB connection string | `mongodb+srv://blackholeinfiverse54_db_user:Gjpl998Z6hsQLjJF@artha.rzneis7.mongodb.net/?appName=Artha` |
-| `DATABASE_NAME` | MongoDB database name | `mitra_production` |
-| `API_KEY` | API key for authentication | Set in `.env` |
-| `JWT_SECRET_KEY` | JWT signing secret | Set in `.env` |
+| Variable | Description |
+|----------|-------------|
+| `MONGODB_URI` | MongoDB connection string |
+| `DATABASE_NAME` | Database name |
+| `API_KEY` | API authentication key |
+| `JWT_SECRET_KEY` | JWT signing secret |
 
-### Optional (for AI responses)
+### Optional (AI)
 
 | Variable | Description |
 |----------|-------------|
-| `GROQ_API_KEY` | Groq API key (free tier available) |
+| `GROQ_API_KEY` | Groq API key |
 | `OPENAI_API_KEY` | OpenAI API key |
-| `GOOGLE_API_KEY` | Google Gemini API key |
+| `GOOGLE_API_KEY` | Google Gemini key |
 | `MISTRAL_API_KEY` | Mistral API key |
 
-### Optional (for integrations)
+### Optional (Ecosystem)
 
 | Variable | Description |
 |----------|-------------|
-| `TWILIO_ACCOUNT_SID` | Twilio account SID |
+| `UNIGURU_API_URL` | UniGuru API URL |
+| `UNIGURU_API_KEY` | UniGuru API key |
+| `SETU_API_URL` | SETU API URL |
+| `SETU_API_KEY` | SETU API key |
+| `GURUKUL_API_URL` | Gurukul API URL |
+| `GURUKUL_API_KEY` | Gurukul API key |
+| `SAMRUDDHI_API_URL` | Samruddhi API URL |
+| `SAMRUDDHI_API_KEY` | Samruddhi API key |
+| `NAMAMI_GANGE_API_URL` | Namami Gange API URL |
+| `NAMAMI_GANGE_API_KEY` | Namami Gange API key |
+| `SVACS_API_URL` | SVACS API URL |
+| `SVACS_API_KEY` | SVACS API key |
+| `UCCIS_API_URL` | UCCIS API URL |
+| `UCCIS_API_KEY` | UCCIS API key |
+| `NYAI_API_URL` | NYAI API URL |
+| `NYAI_API_KEY` | NYAI API key |
+| `BRAHMANDA_API_URL` | Brahmanda API URL |
+| `BRAHMANDA_API_KEY` | Brahmanda API key |
+| `TANTRA_API_URL` | TANTRA API URL |
+| `TANTRA_API_KEY` | TANTRA API key |
+
+### Optional (Integrations)
+
+| Variable | Description |
+|----------|-------------|
+| `TWILIO_ACCOUNT_SID` | Twilio SID |
 | `TWILIO_AUTH_TOKEN` | Twilio auth token |
 | `TELEGRAM_BOT_TOKEN` | Telegram bot token |
-| `BREVO_API_KEY` | Brevo email API key |
-| `SENDGRID_API_KEY` | SendGrid email API key |
+| `BREVO_API_KEY` | Brevo email key |
+| `SENDGRID_API_KEY` | SendGrid key |
+
+### Optional (Monitoring)
+
+| Variable | Description |
+|----------|-------------|
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | OTEL collector endpoint |
+| `OTEL_SERVICE_NAME` | Service name for traces |
+| `SENTRY_DSN` | Sentry error tracking |
 
 ---
 
@@ -261,57 +308,24 @@ python -m pytest tests/ -v
 
 ### Backend Won't Start
 
-1. Check Python version: `python --version` (need 3.10+)
+1. Check Python version: `python --version` (need 3.11+)
 2. Check MongoDB connection: Verify `MONGODB_URI` in `.env`
 3. Check port availability: Ensure port 8000 is not in use
 
-### Frontend Won't Start
+### Docker Issues
 
-1. Check Node.js version: `node --version` (need 16+)
-2. Clear npm cache: `npm cache clean --force`
-3. Reinstall dependencies: `rm -rf node_modules && npm install`
+1. Check Docker is running: `docker ps`
+2. Check logs: `docker-compose logs mitra-core`
+3. Rebuild: `docker-compose build --no-cache`
 
-### MongoDB Connection Issues
+### Monitoring Not Working
 
-1. Verify IP whitelist in MongoDB Atlas
-2. Check username/password in connection string
-3. Verify network connectivity
+1. Verify OTEL collector: `docker-compose logs otel-collector`
+2. Check Prometheus targets: http://localhost:9090/targets
+3. Verify Grafana datasource: http://localhost:3001/datasources
 
-### API Key Errors
+### Ecosystem Adapters Failing
 
-1. Ensure `API_KEY` is set in `backend/.env`
-2. Ensure `REACT_APP_API_KEY` in `frontend/frontend/.env` matches
-3. Restart both servers after changing keys
-
----
-
-## Production Deployment
-
-### Backend (Render)
-
-1. Push code to GitHub
-2. Connect repository to Render
-3. Set environment variables in Render dashboard
-4. Deploy with:
-   - Root Directory: `backend`
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-
-### Frontend (Vercel)
-
-1. Push code to GitHub
-2. Connect repository to Vercel
-3. Set environment variables in Vercel dashboard
-4. Deploy with:
-   - Root Directory: `frontend/frontend`
-   - Build Command: `npm run build`
-   - Output Directory: `build`
-
----
-
-## Support
-
-For issues or questions:
-1. Check the API documentation at http://localhost:8000/docs
-2. Review the health status at http://localhost:8000/health
-3. Check the metrics at http://localhost:8000/api/metrics
+1. Check adapter health: `curl -H "X-API-Key: your_key" http://localhost:8000/api/ecosystem/health`
+2. Verify product API URLs in environment variables
+3. Check network connectivity to product APIs

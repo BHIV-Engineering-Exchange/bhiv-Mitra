@@ -46,9 +46,11 @@ from app.api.webhooks import router as webhook_router
 from app.api.tts import router as tts_router
 from app.api.replay import router as replay_router
 from app.api.metrics import router as metrics_router
+from app.api.ecosystem import router as ecosystem_router
 from app.executors.telegram_executor import TelegramExecutor
 from app.services.reminder_scheduler import ReminderScheduler, SchedulerConfig
 from app.mitra_system_health import get_system_health_snapshot
+from app.core.monitoring import init_monitoring, init_prometheus_metrics
 
 # -------------------------------------------------
 # Logging
@@ -187,10 +189,18 @@ app.add_middleware(
 # -------------------------------------------------
 # Security Middleware
 # -------------------------------------------------
+# -------------------------------------------------
+# Initialize Monitoring (OpenTelemetry + Prometheus)
+# -------------------------------------------------
+@app.on_event("startup")
+async def _startup_monitoring():
+    init_monitoring()
+    init_prometheus_metrics(app)
+
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
     # Allow health check and root without auth
-    if request.url.path in ["/health", "/"]:
+    if request.url.path in ["/health", "/", "/metrics"]:
         response = await call_next(request)
         return response
 
@@ -255,6 +265,7 @@ app.include_router(webhook_router)
 app.include_router(tts_router)
 app.include_router(replay_router)
 app.include_router(metrics_router)
+app.include_router(ecosystem_router)
 
 # -------------------------------------------------
 # System Endpoints
@@ -280,6 +291,11 @@ async def root():
             "metrics_enforcement": "/api/metrics/enforcement",
             "tts": "/api/tts",
             "tts_status": "/api/tts/status",
+            "ecosystem_products": "/api/ecosystem/products",
+            "ecosystem_manifests": "/api/ecosystem/manifests",
+            "ecosystem_health": "/api/ecosystem/health",
+            "ecosystem_query": "/api/ecosystem/query",
+            "ecosystem_execute": "/api/ecosystem/execute",
         },
         "version": "3.0.0",
         "timestamp": datetime.utcnow().isoformat() + "Z",
