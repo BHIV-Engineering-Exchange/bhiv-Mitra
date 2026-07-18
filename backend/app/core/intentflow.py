@@ -11,17 +11,19 @@ import dateutil.parser as parser
 class IntentFlow:
     def __init__(self):
         # Intent patterns and keywords
+        # NOTE: Task-related patterns should only match EXPLICIT task creation requests
+        # NOT general questions that happen to contain words like "task" or "create"
         self.intent_patterns = {
             'summarize': ['summarize', 'summary', 'summarise', 'tl;dr', 'key points', 'brief'],
-            'task': ['task', 'todo', 'remind', 'schedule', 'create task', 'add to list'],
-            'search': ['search', 'find', 'lookup', 'query', 'research'],
-            'email': ['email', 'send mail', 'compose', 'message'],
-            'calendar': ['calendar', 'schedule', 'meeting', 'appointment', 'event'],
-            'reminder': ['remind', 'reminder', 'alert', 'notify'],
-            'telegram': ['telegram', 'send telegram'],
-            'instagram': ['instagram', 'insta', 'send dm'],
-            'ems': ['ems', 'ems task', 'create task', 'assign task'],
-            'device': ['device', 'desktop', 'mobile', 'tablet', 'xr'],
+            'task': ['create a task', 'add a task', 'make a task', 'new task for', 'assign task to', 'create todo', 'add to my todo'],
+            'search': ['search for', 'find me', 'lookup', 'research about', 'look up'],
+            'email': ['send email', 'send an email', 'email to', 'compose email', 'send mail to'],
+            'calendar': ['add to calendar', 'schedule meeting', 'create event', 'set appointment', 'add meeting'],
+            'reminder': ['set reminder', 'remind me to', 'create reminder', 'add reminder', 'alert me to'],
+            'telegram': ['send telegram', 'telegram message to'],
+            'instagram': ['send instagram', 'instagram message to', 'send dm on instagram'],
+            'ems': ['create ems task', 'assign ems task', 'ems assignment'],
+            'device': ['send command to device', 'control device', 'device command'],
             'general': []  # fallback
         }
 

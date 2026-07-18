@@ -57,6 +57,8 @@ class ApiService {
     try {
       // Build request payload for AI-BEING-FINAL backend (V3.0.0 Contract)
       // The backend expects a unified single endpoint /api/assistant
+      const preferredLanguage = localStorage.getItem('mitra_language') || 'en';
+
       const requestPayload = {
         version: "3.0.0",
         input: {
@@ -67,7 +69,8 @@ class ApiService {
           platform: request.platform || 'web',
           device: request.device_context || 'desktop',
           voice_input: request.voice_input || false,
-          session_id: 'default'
+          session_id: 'default',
+          preferred_language: preferredLanguage
         }
       };
 

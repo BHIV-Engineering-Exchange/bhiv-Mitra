@@ -268,6 +268,22 @@ app.include_router(metrics_router)
 app.include_router(ecosystem_router)
 
 # -------------------------------------------------
+# Direct LLM Test Endpoint (bypasses broken routers package)
+# -------------------------------------------------
+from pydantic import BaseModel as _BaseModel
+from typing import Optional as _Optional
+from app.core.llm_bridge import llm_bridge as _llm_bridge
+
+class _LLMRequest(_BaseModel):
+    prompt: str
+    model: str = "uniguru"
+
+@app.post("/external_llm")
+async def call_external_llm(request: _LLMRequest):
+    response = await _llm_bridge.call_llm(request.model, request.prompt)
+    return {"response": response}
+
+# -------------------------------------------------
 # System Endpoints
 # -------------------------------------------------
 @app.get("/")

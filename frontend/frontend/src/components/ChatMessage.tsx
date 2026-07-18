@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import Markdown from 'react-markdown';
 import { AssistantResponse } from '../types';
 import StatusIndicator from './StatusIndicator';
 import ActionCard from './ActionCard';
@@ -255,9 +256,38 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             {/* Main Response */}
             {displayResponseText && (
               <div className="mb-3 flex items-start gap-2">
-                <p ref={messageTextRef} className="flex-1 text-iosGray-900 dark:text-white text-[15px] leading-relaxed whitespace-pre-wrap font-sf">
-                  {displayResponseText}
-                </p>
+                <div ref={messageTextRef} className="flex-1 text-iosGray-900 dark:text-white text-[15px] leading-relaxed font-sf markdown-body">
+                  <Markdown
+                    components={{
+                      h1: ({...props}) => <h1 className="text-xl font-bold mt-4 mb-2 text-iosGray-900 dark:text-white" {...props} />,
+                      h2: ({...props}) => <h2 className="text-lg font-bold mt-3 mb-1.5 text-iosGray-900 dark:text-white" {...props} />,
+                      h3: ({...props}) => <h3 className="text-base font-semibold mt-3 mb-1 text-iosGray-900 dark:text-white" {...props} />,
+                      p: ({...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                      ul: ({...props}) => <ul className="list-disc pl-5 mb-2 space-y-1" {...props} />,
+                      ol: ({...props}) => <ol className="list-decimal pl-5 mb-2 space-y-1" {...props} />,
+                      li: ({...props}) => <li className="text-[15px]" {...props} />,
+                      strong: ({...props}) => <strong className="font-semibold text-iosGray-900 dark:text-white" {...props} />,
+                      em: ({...props}) => <em className="italic" {...props} />,
+                      code: ({className, children, ...props}) => {
+                        const isBlock = className && className.startsWith('language-');
+                        if (isBlock) {
+                          return <code className="block text-sm font-mono text-iosGray-800 dark:text-iosGray-200" {...props}>{children}</code>;
+                        }
+                        return <code className="bg-iosGray-100 dark:bg-iosGray-700 px-1.5 py-0.5 rounded text-sm font-mono text-pink-600 dark:text-pink-400" {...props}>{children}</code>;
+                      },
+                      pre: ({children, ...props}) => <pre className="bg-iosGray-50 dark:bg-iosGray-900 border border-iosGray-200 dark:border-iosGray-700 rounded-xl p-4 mb-3 overflow-x-auto text-sm font-mono" {...props}>{children}</pre>,
+                      table: ({...props}) => <div className="overflow-x-auto mb-2"><table className="min-w-full text-sm border-collapse" {...props} /></div>,
+                      thead: ({...props}) => <thead className="bg-iosGray-50 dark:bg-iosGray-800" {...props} />,
+                      th: ({...props}) => <th className="px-3 py-2 text-left font-semibold text-iosGray-700 dark:text-iosGray-300 border-b border-iosGray-200 dark:border-iosGray-700" {...props} />,
+                      td: ({...props}) => <td className="px-3 py-2 border-b border-iosGray-100 dark:border-iosGray-800" {...props} />,
+                      blockquote: ({...props}) => <blockquote className="border-l-4 border-iosBlue-300 pl-3 italic text-iosGray-600 dark:text-iosGray-400 mb-2" {...props} />,
+                      hr: ({...props}) => <hr className="my-3 border-iosGray-200 dark:border-iosGray-700" {...props} />,
+                      a: ({...props}) => <a className="text-iosBlue-500 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                    }}
+                  >
+                    {displayResponseText}
+                  </Markdown>
+                </div>
                 <button
                   type="button"
                   onClick={() => (isSpeaking ? stopSpeaking() : speakText())}

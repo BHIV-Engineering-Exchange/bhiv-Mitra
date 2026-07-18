@@ -12,17 +12,25 @@ const LanguageContext = createContext<LanguageContextType>({
   isRTL: false,
 });
 
-// Map of RTL languages
-const RTL_LANGUAGES = ['ar', 'he', 'ur', 'fa'];
+const STORAGE_KEY = 'mitra_language';
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [currentLanguage, setCurrentLanguage] = useState(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEY) || 'en';
+    } catch {
+      return 'en';
+    }
+  });
 
   const setLanguage = useCallback((lang: string) => {
     setCurrentLanguage(lang);
+    try {
+      localStorage.setItem(STORAGE_KEY, lang);
+    } catch {}
   }, []);
 
-  const isRTL = RTL_LANGUAGES.includes(currentLanguage);
+  const isRTL = false;
 
   return (
     <LanguageContext.Provider value={{ currentLanguage, setLanguage, isRTL }}>

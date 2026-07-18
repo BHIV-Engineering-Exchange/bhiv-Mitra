@@ -34,10 +34,383 @@ class LocalKnowledgeBase:
         self._initialize_knowledge()
     
     def _initialize_knowledge(self):
-        """Initialize with common knowledge topics."""
+        """Initialize with comprehensive knowledge base covering all major topics."""
         self.knowledge = {
+            # ===== LIFE & ORIGIN =====
+            "origin_of_life": {
+                "keywords": ["how life", "life on earth", "origin of life", "life came", "beginning of life", "first life", "how did life start", "abiogenesis"],
+                "response": (
+                    "# 🌱 How Life Originated on Earth\n\n"
+                    "## Overview\n"
+                    "Life on Earth began approximately **3.5-4 billion years ago** through a process called **abiogenesis** — "
+                    "the natural process by which living organisms arise from non-living matter.\n\n"
+                    "## Theories of Origin\n\n"
+                    "### 1. Primordial Soup Theory (Oparin-Haldane)\n"
+                    "- Early Earth had a reducing atmosphere (methane, ammonia, water vapor)\n"
+                    "- Lightning and UV radiation energy caused chemical reactions\n"
+                    "- Simple organic molecules (amino acids) formed in oceans\n"
+                    "- These molecules combined to form more complex structures\n"
+                    "- Eventually, self-replicating molecules emerged\n\n"
+                    "### 2. Hydrothermal Vent Theory\n"
+                    "- Life began at deep-sea hydrothermal vents\n"
+                    "- These vents provided energy, heat, and chemical nutrients\n"
+                    "- Minerals in vents acted as catalysts for chemical reactions\n"
+                    "- Supported by the fact that all life requires water\n\n"
+                    "### 3. RNA World Hypothesis\n"
+                    "- RNA preceded both DNA and proteins\n"
+                    "- RNA can store information AND catalyze reactions\n"
+                    "- Self-replicating RNA molecules were the first life forms\n"
+                    "- Later, DNA took over information storage, proteins took over catalysis\n\n"
+                    "### 4. Panspermia\n"
+                    "- Life's building blocks arrived from space\n"
+                    "- Meteorites contain amino acids and organic compounds\n"
+                    "- Doesn't explain HOW life started, just WHERE\n\n"
+                    "## Key Milestones\n"
+                    "| Time | Event |\n"
+                    "|------|-------|\n"
+                    "| ~4.5 billion years ago | Earth forms |\n"
+                    "| ~4.0 billion years ago | First oceans form |\n"
+                    "| ~3.8 billion years ago | First organic molecules |\n"
+                    "| ~3.5 billion years ago | First simple cells (prokaryotes) |\n"
+                    "| ~2.0 billion years ago | First complex cells (eukaryotes) |\n"
+                    "| ~0.5 billion years ago | Cambrian Explosion (complex life) |\n\n"
+                    "## Evidence\n"
+                    "- **Fossilized bacteria** in 3.5-billion-year-old rocks\n"
+                    "- **Stromatolites** (layered structures from cyanobacteria)\n"
+                    "- **Chemical signatures** in ancient rocks\n"
+                    "- **Miller-Urey experiment** showed amino acids form from simple gases\n\n"
+                    "## Summary\n"
+                    "Life likely began through natural chemical processes in Earth's early oceans, "
+                    "progressing from simple molecules to self-replicating systems to the first cells."
+                )
+            },
+            "percentage_formula": {
+                "keywords": ["percentage", "percent", "formula for percentage", "find percentage", "calculate percentage", "% formula"],
+                "response": (
+                    "# 📊 Percentage Formulas\n\n"
+                    "## Basic Percentage Formula\n"
+                    "```\n"
+                    "Percentage = (Part / Whole) × 100\n"
+                    "```\n\n"
+                    "## Common Formulas\n\n"
+                    "### 1. Finding Percentage of a Number\n"
+                    "```\n"
+                    "Result = (Percentage / 100) × Number\n"
+                    "Example: 20% of 150 = (20/100) × 150 = 30\n"
+                    "```\n\n"
+                    "### 2. Finding What Percent One Number is of Another\n"
+                    "```\n"
+                    "Percentage = (Part / Whole) × 100\n"
+                    "Example: What % is 45 of 180? = (45/180) × 100 = 25%\n"
+                    "```\n\n"
+                    "### 3. Percentage Increase/Decrease\n"
+                    "```\n"
+                    "Percentage Change = ((New Value - Old Value) / Old Value) × 100\n"
+                    "Increase: ((150 - 100) / 100) × 100 = 50% increase\n"
+                    "Decrease: ((80 - 100) / 100) × 100 = 20% decrease\n"
+                    "```\n\n"
+                    "### 4. Finding Original Value After Percentage Change\n"
+                    "```\n"
+                    "Original = New Value / (1 + Percentage/100)  [for increase]\n"
+                    "Original = New Value / (1 - Percentage/100)  [for decrease]\n"
+                    "```\n\n"
+                    "### 5. Percentage Points vs Percentage\n"
+                    "- **Percentage point**: Absolute difference (45% to 50% = 5 percentage points)\n"
+                    "- **Percentage change**: Relative change ((50-45)/45 × 100 = 11.1% increase)\n\n"
+                    "## Quick Reference Table\n"
+                    "| To Find | Formula |\n"
+                    "|---------|---------|\n"
+                    "| X% of Y | (X/100) × Y |\n"
+                    "| What % is X of Y | (X/Y) × 100 |\n"
+                    "| % increase | ((New-Old)/Old) × 100 |\n"
+                    "| % decrease | ((Old-New)/Old) × 100 |"
+                )
+            },
+            # ===== SCIENCE =====
+            "physics": {
+                "keywords": ["physics", "gravity", "force", "energy", "velocity", "acceleration", "newton", "motion", "thermodynamics", "quantum", "relativity"],
+                "response": (
+                    "# ⚛️ Physics\n\n"
+                    "## Overview\n"
+                    "Physics is the study of matter, energy, and the fundamental forces of nature.\n\n"
+                    "## Key Concepts\n\n"
+                    "### Newton's Laws of Motion\n"
+                    "1. **First Law (Inertia)**: An object at rest stays at rest; in motion stays in motion unless acted upon\n"
+                    "2. **Second Law**: F = ma (Force = mass × acceleration)\n"
+                    "3. **Third Law**: Every action has an equal and opposite reaction\n\n"
+                    "### Fundamental Forces\n"
+                    "| Force | Description | Relative Strength |\n"
+                    "|-------|-------------|-------------------|\n"
+                    "| Strong Nuclear | Holds atomic nuclei together | 1 |\n"
+                    "| Electromagnetic | Electric and magnetic interactions | 10⁻² |\n"
+                    "| Weak Nuclear | Radioactive decay | 10⁻⁶ |\n"
+                    "| Gravity | Attraction between masses | 10⁻³⁹ |\n\n"
+                    "### Key Equations\n"
+                    "- **Gravity**: F = G(m₁m₂)/r²\n"
+                    "- **Kinetic Energy**: KE = ½mv²\n"
+                    "- **Potential Energy**: PE = mgh\n"
+                    "- **Ohm's Law**: V = IR\n"
+                    "- **Einstein**: E = mc²\n\n"
+                    "### Branches\n"
+                    "- Classical Mechanics\n"
+                    "- Thermodynamics\n"
+                    "- Electromagnetism\n"
+                    "- Quantum Mechanics\n"
+                    "- Relativity\n"
+                    "- Astrophysics"
+                )
+            },
+            "chemistry": {
+                "keywords": ["chemistry", "chemical", "element", "compound", "molecule", "atom", "reaction", "periodic table", "bond"],
+                "response": (
+                    "# 🧪 Chemistry\n\n"
+                    "## Overview\n"
+                    "Chemistry is the study of matter, its properties, structure, and how it changes.\n\n"
+                    "## Basic Concepts\n\n"
+                    "### Structure of Matter\n"
+                    "- **Atom**: Smallest unit of an element (protons, neutrons, electrons)\n"
+                    "- **Molecule**: Two or more atoms bonded together\n"
+                    "- **Compound**: Substance made of two or more different elements\n"
+                    "- **Element**: Pure substance with only one type of atom\n\n"
+                    "### Chemical Bonding\n"
+                    "| Type | Description | Example |\n"
+                    "|------|-------------|---------|\n"
+                    "| Ionic | Transfer of electrons | NaCl (salt) |\n"
+                    "| Covalent | Sharing of electrons | H₂O (water) |\n"
+                    "| Metallic | Delocalized electrons | Fe (iron) |\n\n"
+                    "### States of Matter\n"
+                    "1. **Solid**: Fixed shape and volume\n"
+                    "2. **Liquid**: Fixed volume, takes shape of container\n"
+                    "3. **Gas**: No fixed shape or volume\n"
+                    "4. **Plasma**: Ionized gas (stars, lightning)\n\n"
+                    "### Key Laws\n"
+                    "- **Law of Conservation**: Mass is neither created nor destroyed\n"
+                    "- **Law of Definite Proportions**: Compound always has same element ratio\n"
+                    "- **Ideal Gas Law**: PV = nRT"
+                )
+            },
+            "biology": {
+                "keywords": ["biology", "cell", "dna", "evolution", "organism", "gene", "species", "ecosystem", "protein", "photosynthesis"],
+                "response": (
+                    "# 🧬 Biology\n\n"
+                    "## Overview\n"
+                    "Biology is the study of living organisms and their interactions with the environment.\n\n"
+                    "## Key Concepts\n\n"
+                    "### Cell Biology\n"
+                    "- **Cell**: Basic unit of life\n"
+                    "- **Prokaryotes**: No nucleus (bacteria)\n"
+                    "- **Eukaryotes**: Have nucleus (plants, animals, fungi)\n\n"
+                    "### DNA & Genetics\n"
+                    "- **DNA**: Deoxyribonucleic acid - carries genetic information\n"
+                    "- **Gene**: Segment of DNA that codes for a protein\n"
+                    "- **Chromosome**: Structure containing many genes\n"
+                    "- **Mutation**: Change in DNA sequence\n\n"
+                    "### Evolution\n"
+                    "- **Natural Selection**: Survival of the fittest\n"
+                    "- **Adaptation**: Traits that improve survival\n"
+                    "- **Speciation**: Formation of new species\n"
+                    "- **Common Descent**: All life shares common ancestor\n\n"
+                    "### Ecology\n"
+                    "- **Ecosystem**: Community of living and non-living things\n"
+                    "- **Food Chain**: Flow of energy through organisms\n"
+                    "- **Biodiversity**: Variety of life in an area\n\n"
+                    "### Key Processes\n"
+                    "- **Photosynthesis**: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂\n"
+                    "- **Cellular Respiration**: C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP\n"
+                    "- **Protein Synthesis**: DNA → mRNA → Protein"
+                )
+            },
+            "astronomy": {
+                "keywords": ["astronomy", "space", "planet", "star", "galaxy", "universe", "solar system", "moon", "sun", "earth", "mars", "jupiter"],
+                "response": (
+                    "# 🌌 Astronomy\n\n"
+                    "## Overview\n"
+                    "Astronomy is the study of celestial objects, space, and the universe.\n\n"
+                    "## Solar System\n"
+                    "| Planet | Distance from Sun | Key Feature |\n"
+                    "|--------|-------------------|-------------|\n"
+                    "| Mercury | 57.9 million km | Smallest, fastest orbit |\n"
+                    "| Venus | 108.2 million km | Hottest, rotates backwards |\n"
+                    "| Earth | 149.6 million km | Only known life |\n"
+                    "| Mars | 227.9 million km | Red Planet, Olympus Mons |\n"
+                    "| Jupiter | 778.5 million km | Largest, Great Red Spot |\n"
+                    "| Saturn | 1,434 million km | Beautiful rings |\n"
+                    "| Uranus | 2,871 million km | Tilted axis, ice giant |\n"
+                    "| Neptune | 4,495 million km | Farthest, windiest |\n\n"
+                    "## Key Concepts\n"
+                    "- **Light Year**: Distance light travels in one year (9.46 trillion km)\n"
+                    "- **Parsec**: 3.26 light years\n"
+                    "- **Redshift**: Object moving away (universe expanding)\n"
+                    "- **Black Hole**: Object with gravity so strong nothing escapes\n\n"
+                    "## Universe Facts\n"
+                    "- Age: ~13.8 billion years\n"
+                    "- Size: ~93 billion light years in diameter\n"
+                    "- Galaxies: ~2 trillion in observable universe\n"
+                    "- Stars: ~200 billion trillion in universe"
+                )
+            },
+            # ===== MATHEMATICS =====
+            "math_formulas": {
+                "keywords": ["formula", "equation", "calculate", "math", "algebra", "geometry", "trigonometry", "calculus", "statistics"],
+                "response": (
+                    "# 📐 Mathematics Formulas\n\n"
+                    "## Algebra\n"
+                    "| Formula | Description |\n"
+                    "|---------|-------------|\n"
+                    "| (a+b)² = a² + 2ab + b² | Square of sum |\n"
+                    "| (a-b)² = a² - 2ab + b² | Square of difference |\n"
+                    "| a² - b² = (a+b)(a-b) | Difference of squares |\n"
+                    "| Quadratic: x = (-b ± √(b²-4ac)) / 2a | Solve ax²+bx+c=0 |\n\n"
+                    "## Geometry\n"
+                    "| Shape | Area | Perimeter/Circumference |\n"
+                    "|-------|------|------------------------|\n"
+                    "| Circle | πr² | 2πr |\n"
+                    "| Rectangle | l × w | 2(l+w) |\n"
+                    "| Triangle | ½ × b × h | a+b+c |\n"
+                    "| Square | s² | 4s |\n\n"
+                    "## Trigonometry\n"
+                    "- sin θ = Opposite / Hypotenuse\n"
+                    "- cos θ = Adjacent / Hypotenuse\n"
+                    "- tan θ = Opposite / Adjacent\n"
+                    "- sin²θ + cos²θ = 1\n\n"
+                    "## Statistics\n"
+                    "- Mean = Sum of values / Number of values\n"
+                    "- Median = Middle value\n"
+                    "- Mode = Most frequent value\n"
+                    "- Standard Deviation = √(Σ(x-μ)²/N)\n\n"
+                    "## Calculus\n"
+                    "- Derivative: d/dx[xⁿ] = nxⁿ⁻¹\n"
+                    "- Integral: ∫xⁿdx = xⁿ⁺¹/(n+1) + C\n"
+                    "- Chain Rule: d/dx[f(g(x))] = f'(g(x)) × g'(x)"
+                )
+            },
+            # ===== PSYCHOLOGY =====
+            "psychology": {
+                "keywords": ["psychology", "mental health", "brain", "behavior", "cognitive", "emotion", "memory", "learning", "therapy", "anxiety", "depression"],
+                "response": (
+                    "# 🧠 Psychology\n\n"
+                    "## Overview\n"
+                    "Psychology is the scientific study of the mind and behavior.\n\n"
+                    "## Branches of Psychology\n"
+                    "| Branch | Focus |\n"
+                    "|--------|-------|\n"
+                    "| Clinical | Mental health disorders |\n"
+                    "| Cognitive | Mental processes (memory, thinking) |\n"
+                    "| Developmental | Changes across lifespan |\n"
+                    "| Social | How people affect each other |\n"
+                    "| Behavioral | Observable behavior |\n"
+                    "| Neuropsychology | Brain-behavior relationship |\n\n"
+                    "## Key Concepts\n\n"
+                    "### Memory\n"
+                    "- **Sensory Memory**: Very brief (0.5-3 seconds)\n"
+                    "- **Short-term Memory**: 15-30 seconds, 7±2 items\n"
+                    "- **Long-term Memory**: Potentially unlimited capacity\n\n"
+                    "### Learning Theories\n"
+                    "- **Classical Conditioning** (Pavlov): Association between stimuli\n"
+                    "- **Operant Conditioning** (Skinner): Rewards and punishments\n"
+                    "- **Observational Learning** (Bandura): Learning by watching\n\n"
+                    "### Cognitive Biases\n"
+                    "- **Confirmation Bias**: Seeking confirming evidence\n"
+                    "- **Anchoring**: Over-relying on first information\n"
+                    "- **Availability**: Judging by easily recalled examples\n\n"
+                    "### Mental Health\n"
+                    "- **Anxiety Disorders**: Excessive worry and fear\n"
+                    "- **Depression**: Persistent sadness and loss of interest\n"
+                    "- **PTSD**: Trauma-related symptoms\n"
+                    "- Treatment: Therapy, medication, lifestyle changes"
+                )
+            },
+            # ===== TECHNOLOGY =====
+            "artificial_intelligence": {
+                "keywords": ["artificial intelligence", "ai", "machine learning", "deep learning", "neural network", "nlp", "computer vision"],
+                "response": (
+                    "# 🤖 Artificial Intelligence\n\n"
+                    "## Overview\n"
+                    "AI is the simulation of human intelligence by machines.\n\n"
+                    "## Types of AI\n"
+                    "| Type | Description | Example |\n"
+                    "|------|-------------|---------|\n"
+                    "| Narrow AI | Specific task | Siri, chess engines |\n"
+                    "| General AI | Human-level intelligence | Not yet achieved |\n"
+                    "| Super AI | Beyond human intelligence | Theoretical |\n\n"
+                    "## Key Technologies\n"
+                    "- **Machine Learning**: Systems learn from data\n"
+                    "- **Deep Learning**: Neural networks with many layers\n"
+                    "- **NLP**: Understanding human language\n"
+                    "- **Computer Vision**: Interpreting images/video\n"
+                    "- **Robotics**: Physical agents\n\n"
+                    "## Applications\n"
+                    "- Virtual assistants\n"
+                    "- Self-driving cars\n"
+                    "- Medical diagnosis\n"
+                    "- Financial trading\n"
+                    "- Game playing\n"
+                    "- Content generation"
+                )
+            },
+            "programming": {
+                "keywords": ["programming", "coding", "code", "developer", "software", "algorithm", "data structure"],
+                "response": (
+                    "# 💻 Programming\n\n"
+                    "## Overview\n"
+                    "Programming is the process of creating instructions for computers.\n\n"
+                    "## Popular Languages\n"
+                    "| Language | Use Case |\n"
+                    "|----------|----------|\n"
+                    "| Python | Data science, AI, web |\n"
+                    "| JavaScript | Web development |\n"
+                    "| Java | Enterprise, Android |\n"
+                    "| C++ | Systems, games |\n"
+                    "| TypeScript | Large-scale web apps |\n"
+                    "| Go | Cloud, microservices |\n"
+                    "| Rust | Systems, safety-critical |\n\n"
+                    "## Key Concepts\n"
+                    "- **Variables**: Store data\n"
+                    "- **Functions**: Reusable code blocks\n"
+                    "- **Loops**: Repeat operations\n"
+                    "- **Conditionals**: Decision making\n"
+                    "- **OOP**: Object-oriented programming\n\n"
+                    "## Data Structures\n"
+                    "- Arrays, Linked Lists\n"
+                    "- Stacks, Queues\n"
+                    "- Trees, Graphs\n"
+                    "- Hash Tables"
+                )
+            },
+            # ===== HEALTH =====
+            "health": {
+                "keywords": ["health", "nutrition", "diet", "exercise", "fitness", "medical", "disease", "symptom", "treatment", "wellness"],
+                "response": (
+                    "# 🏥 Health & Wellness\n\n"
+                    "## Overview\n"
+                    "Health is a state of complete physical, mental, and social well-being.\n\n"
+                    "## Physical Health\n\n"
+                    "### Nutrition Guidelines\n"
+                    "| Nutrient | Daily Recommendation |\n"
+                    "|----------|---------------------|\n"
+                    "| Calories | 2,000-2,500 (varies) |\n"
+                    "| Protein | 0.8g per kg body weight |\n"
+                    "| Water | 8 glasses (2 liters) |\n"
+                    "| Fiber | 25-30g |\n"
+                    "| Sodium | <2,300mg |\n\n"
+                    "### Exercise Recommendations\n"
+                    "- **Aerobic**: 150 min moderate OR 75 min vigorous per week\n"
+                    "- **Strength**: 2+ days per week\n"
+                    "- **Flexibility**: Stretching 2-3 times per week\n\n"
+                    "## Mental Health\n"
+                    "- **Sleep**: 7-9 hours for adults\n"
+                    "- **Stress Management**: Meditation, exercise, social connection\n"
+                    "- **Mindfulness**: Being present in the moment\n\n"
+                    "## Preventive Care\n"
+                    "- Regular check-ups\n"
+                    "- Vaccinations\n"
+                    "- screenings (blood pressure, cholesterol)\n"
+                    "- Dental visits every 6 months"
+                )
+            },
+            # ===== EXISTING TOPICS (kept for backward compatibility) =====
             "reinforcement_learning": {
-                "keywords": ["reinforcement learning", "rl", "reward", "agent", "policy", "q-learning", "deep q"],
+                "keywords": ["reinforcement learning", "rl", "reward", "agent", "policy", "q-learning"],
                 "response": (
                     "Reinforcement Learning (RL) is a type of machine learning where an agent learns to make decisions "
                     "by taking actions in an environment to maximize cumulative rewards.\n\n"
@@ -45,96 +418,40 @@ class LocalKnowledgeBase:
                     "• Agent: The learner/decision-maker\n"
                     "• Environment: The world the agent interacts with\n"
                     "• Actions: Choices the agent can make\n"
-                    "• Rewards: Feedback signals (positive or negative)\n"
-                    "• Policy: The strategy the agent follows\n"
-                    "• Value Function: Expected future rewards\n\n"
-                    "Common algorithms:\n"
-                    "• Q-Learning: Model-free value-based method\n"
-                    "• SARSA: On-policy temporal difference learning\n"
-                    "• PPO (Proximal Policy Optimization): Policy gradient method\n"
-                    "• DQN (Deep Q-Network): Uses neural networks for Q-values\n\n"
-                    "Applications:\n"
-                    "• Game playing (AlphaGo, Atari games)\n"
-                    "• Robotics and automation\n"
-                    "• Autonomous vehicles\n"
-                    "• Recommendation systems\n"
-                    "• Resource management\n\n"
-                    "RL differs from supervised learning (learns from labeled data) and unsupervised learning "
-                    "(finds patterns in unlabeled data) by learning through trial and error with feedback."
+                    "• Rewards: Feedback signals\n"
+                    "• Policy: The strategy the agent follows\n\n"
+                    "Applications: Game playing, robotics, autonomous vehicles, recommendation systems."
                 )
             },
-            "machine_learning": {
-                "keywords": ["machine learning", "ml", "supervised", "unsupervised", "neural network", "deep learning", "training", "model"],
+            "python": {
+                "keywords": ["python", "python programming", "python language", "python code", "python script"],
                 "response": (
-                    "Machine Learning (ML) is a subset of artificial intelligence that enables systems to learn "
-                    "and improve from experience without explicit programming.\n\n"
-                    "Types of ML:\n"
-                    "• Supervised Learning: Learns from labeled data (classification, regression)\n"
-                    "• Unsupervised Learning: Finds patterns in unlabeled data (clustering, dimensionality reduction)\n"
-                    "• Semi-supervised Learning: Uses both labeled and unlabeled data\n"
-                    "• Reinforcement Learning: Learns through trial and error with rewards\n\n"
-                    "Key concepts:\n"
-                    "• Features: Input variables\n"
-                    "• Labels: Output variables (in supervised learning)\n"
-                    "• Training: Process of teaching the model\n"
-                    "• Overfitting: Model learns noise in training data\n"
-                    "• Generalization: Model performs well on new data\n\n"
-                    "Common algorithms:\n"
-                    "• Linear/Logistic Regression\n"
-                    "• Decision Trees, Random Forests\n"
-                    "• Support Vector Machines (SVM)\n"
-                    "• Neural Networks (Deep Learning)\n"
-                    "• K-Means Clustering\n\n"
-                    "Applications: Image recognition, natural language processing, recommendation systems, "
-                    "fraud detection, medical diagnosis, and many more."
-                )
-            },
-            "artificial_intelligence": {
-                "keywords": ["artificial intelligence", "ai", "cognitive", "intelligent", "automation"],
-                "response": (
-                    "Artificial Intelligence (AI) is the simulation of human intelligence by machines, "
-                    "enabling them to perform tasks that typically require human intelligence.\n\n"
-                    "Branches of AI:\n"
-                    "• Machine Learning: Systems that learn from data\n"
-                    "• Deep Learning: Neural networks with multiple layers\n"
-                    "• Natural Language Processing (NLP): Understanding human language\n"
-                    "• Computer Vision: Interpreting visual information\n"
-                    "• Robotics: Physical agents interacting with the world\n"
-                    "• Expert Systems: Rule-based decision making\n\n"
-                    "AI Applications:\n"
-                    "• Virtual assistants (Siri, Alexa, Mitra!)\n"
-                    "• Image and speech recognition\n"
-                    "• Autonomous vehicles\n"
-                    "• Medical diagnosis\n"
-                    "• Financial trading\n"
-                    "• Game playing (chess, Go)\n\n"
-                    "AI is transforming industries and creating new possibilities, while also raising important "
-                    "ethical considerations about privacy, bias, and job displacement."
-                )
-            },
-            "python_programming": {
-                "keywords": ["python", "programming", "coding", "code", "script", "django", "flask"],
-                "response": (
-                    "Python is a high-level, versatile programming language known for its readability and simplicity.\n\n"
-                    "Key features:\n"
-                    "• Easy to learn and read\n"
-                    "• Extensive standard library\n"
-                    "• Dynamic typing\n"
-                    "• Multiple programming paradigms (OOP, functional, procedural)\n"
-                    "• Large community and ecosystem\n\n"
-                    "Popular frameworks/libraries:\n"
-                    "• Web: Django, Flask, FastAPI\n"
-                    "• Data Science: NumPy, Pandas, Matplotlib\n"
-                    "• ML/AI: TensorFlow, PyTorch, scikit-learn\n"
-                    "• Automation: Selenium, BeautifulSoup\n"
-                    "• APIs: Requests, httpx\n\n"
-                    "Use cases:\n"
-                    "• Web development\n"
-                    "• Data analysis and visualization\n"
-                    "• Machine learning and AI\n"
-                    "• Automation and scripting\n"
-                    "• Scientific computing\n"
-                    "• Game development\n\n"
+                    "# 🐍 Python Programming Language\n\n"
+                    "## Overview\n"
+                    "Python is a popular, versatile programming language known for its readability and simplicity. "
+                    "It's one of the most widely-used languages in the world.\n\n"
+                    "## Key Features\n"
+                    "- **Easy to Learn**: Simple syntax, great for beginners\n"
+                    "- **Versatile**: Web dev, data science, AI, automation, scientific computing\n"
+                    "- **Large Ecosystem**: Extensive libraries and frameworks\n"
+                    "- **Cross-platform**: Windows, macOS, Linux\n"
+                    "- **Dynamic Typing**: No need to declare variable types\n\n"
+                    "## Popular Libraries\n"
+                    "| Library | Use Case |\n"
+                    "|---------|----------|\n"
+                    "| NumPy | Numerical computing |\n"
+                    "| Pandas | Data analysis |\n"
+                    "| Matplotlib | Data visualization |\n"
+                    "| TensorFlow/PyTorch | Machine learning |\n"
+                    "| Django/Flask | Web development |\n"
+                    "| FastAPI | Modern API development |\n\n"
+                    "## Use Cases\n"
+                    "- Data Science and Analytics\n"
+                    "- Machine Learning and AI\n"
+                    "- Web Development\n"
+                    "- Automation and Scripting\n"
+                    "- Scientific computing\n"
+                    "- Game development\n\n"
                     "Python is one of the most popular languages worldwide and is used by companies like "
                     "Google, Netflix, Instagram, and Spotify."
                 )
@@ -212,7 +529,7 @@ class LocalKnowledgeBase:
                 )
             },
             "networking": {
-                "keywords": ["network", "internet", "tcp", "udp", "ip", "http", "protocol", "socket", "port"],
+                "keywords": ["network", "networking", "internet", "tcp", "udp", "ip", "http", "protocol", "socket", "port"],
                 "response": (
                     "Computer networking connects devices to share resources and communicate.\n\n"
                     "Key protocols:\n"
@@ -493,7 +810,7 @@ class LocalKnowledgeBase:
         }
     
     def find_response(self, query: str) -> Optional[str]:
-        """Find a response based on query keywords."""
+        """Find a response based on query keywords using word-boundary matching."""
         query_lower = query.lower()
         
         # Score each topic by keyword matches
@@ -501,7 +818,10 @@ class LocalKnowledgeBase:
         for topic, data in self.knowledge.items():
             score = 0
             for keyword in data["keywords"]:
-                if keyword in query_lower:
+                # Use word-boundary regex to avoid substring false positives
+                # e.g. "ai" should NOT match inside "explain" or "chain"
+                pattern = r'\b' + re.escape(keyword) + r'\b'
+                if re.search(pattern, query_lower):
                     # Longer keywords get more weight
                     score += len(keyword.split())
             if score > 0:
@@ -605,7 +925,7 @@ class LLMBridge:
             elif model == "uniguru":
                 # Use local knowledge base for meaningful responses
                 # Extract the user query from the prompt
-                user_query_match = re.search(r"User request:\s*(.+?)(?:\n|$)", prompt)
+                user_query_match = re.search(r"User (?:request|question):\s*(.+?)(?:\n|$)", prompt)
                 if user_query_match:
                     user_query = user_query_match.group(1).strip()
                 else:

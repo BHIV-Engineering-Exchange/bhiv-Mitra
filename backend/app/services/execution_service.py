@@ -3,10 +3,14 @@ Execution Service Adapter — Universal Execution Gateway
 Routes all platform actions through enforcement-gated execution.
 Supports: WhatsApp, Email, Instagram, Telegram, Calendar, Reminder, EMS, Device Gateway.
 Nothing executes without enforcement ALLOW.
+
+Includes unified runtime execution proof recording for audit trail.
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
+import hashlib
+import json
 
 # Import all platform executors
 from app.executors.whatsapp_executor import WhatsAppExecutor
@@ -22,6 +26,61 @@ from app.external.enforcement.enforcement_verdict import EnforcementVerdict
 from app.services.telegram_contact_service import TelegramContactService
 from app.services.outbound_safety_gate import OutboundSafetyGate, OutboundSafetyDecision
 from app.services.unified_schema_service import build_outbound_payload
+
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
+
+
+class ExecutionProof:
+    """Proof of platform execution for audit trail."""
+    
+    def __init__(
+        self,
+        execution_id: str,
+        platform: str,
+        action_type: str,
+        status: str,
+        trace_id: str,
+        enforcement_decision: str,
+        execution_result: Dict[str, Any],
+    ):
+        self.execution_id = execution_id
+        self.platform = platform
+        self.action_type = action_type
+        self.status = status
+        self.trace_id = trace_id
+        self.timestamp = datetime.utcnow().isoformat() + "Z"
+        self.enforcement_decision = enforcement_decision
+        self.execution_result = execution_result
+        self.integrity_hash = self._generate_integrity_hash()
+    
+    def _generate_integrity_hash(self) -> str:
+        """Generate SHA-256 integrity hash for this proof."""
+        data = {
+            "execution_id": self.execution_id,
+            "platform": self.platform,
+            "action_type": self.action_type,
+            "status": self.status,
+            "trace_id": self.trace_id,
+            "enforcement_decision": self.enforcement_decision,
+            "execution_result": self.execution_result,
+        }
+        canonical = json.dumps(data, sort_keys=True, default=str)
+        return hashlib.sha256(canonical.encode()).hexdigest()
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "execution_id": self.execution_id,
+            "platform": self.platform,
+            "action_type": self.action_type,
+            "status": self.status,
+            "trace_id": self.trace_id,
+            "timestamp": self.timestamp,
+            "enforcement_decision": self.enforcement_decision,
+            "execution_result": self.execution_result,
+            "integrity_hash": self.integrity_hash,
+        }
 
 
 class ExecutionService:
@@ -43,6 +102,53 @@ class ExecutionService:
         self.ems = EMSExecutor()
         self.device_gateway = DeviceGatewayExecutor()
         self.outbound_safety = OutboundSafetyGate()
+        self._execution_proofs: List[ExecutionProof] = []
+    
+    def _record_execution_proof(
+        self,
+        platform: str,
+        action_type: str,
+        trace_id: str,
+        enforcement_decision: str,
+        execution_result: Dict[str, Any],
+    ) -> ExecutionProof:
+        """Record proof of platform execution for audit trail."""
+        execution_id = hashlib.sha256(
+            f"{platform}:{action_type}:{trace_id}:{datetime.utcnow().isoformat()}".encode()
+        ).hexdigest()[:32]
+        
+        proof = ExecutionProof(
+            execution_id=execution_id,
+            platform=platform,
+            action_type=action_type,
+            status=execution_result.get("status", "unknown"),
+            trace_id=trace_id,
+            enforcement_decision=enforcement_decision,
+            execution_result=execution_result,
+        )
+        
+        self._execution_proofs.append(proof)
+        logger.info(f"Execution proof recorded: {proof.execution_id} for {platform}/{action_type}")
+        
+        return proof
+    
+    def get_execution_proofs(
+        self,
+        platform: Optional[str] = None,
+        limit: int = 100,
+    ) -> List[ExecutionProof]:
+        """Get execution proofs, optionally filtered by platform."""
+        proofs = self._execution_proofs
+        if platform:
+            proofs = [p for p in proofs if p.platform == platform]
+        return proofs[-limit:]
+    
+    def get_execution_proof_by_trace_id(self, trace_id: str) -> Optional[ExecutionProof]:
+        """Get execution proof by trace_id."""
+        for proof in reversed(self._execution_proofs):
+            if proof.trace_id == trace_id:
+                return proof
+        return None
 
     def _coerce_enforcement_verdict(self, enforcement_input: Any, trace_id: str) -> EnforcementVerdict:
         if isinstance(enforcement_input, EnforcementVerdict):
@@ -664,6 +770,35 @@ class ExecutionService:
         
         return rewritten_data
     
+    def execute_action_with_proof(self, action_type: str, action_data: Dict[str, Any],
+                                  trace_id: str, enforcement_decision: Any) -> Dict[str, Any]:
+        """
+        Execute action with proof recording for audit trail.
+        Wraps execute_action and records execution proof.
+        """
+        # Execute the action
+        result = self.execute_action(action_type, action_data, trace_id, enforcement_decision)
+        
+        # Record execution proof
+        enforcement_decision_str = "UNKNOWN"
+        if isinstance(enforcement_decision, dict):
+            enforcement_decision_str = enforcement_decision.get("decision", "UNKNOWN")
+        elif isinstance(enforcement_decision, EnforcementVerdict):
+            enforcement_decision_str = enforcement_decision.decision
+        
+        proof = self._record_execution_proof(
+            platform=action_type,
+            action_type=action_data.get("action", "execute"),
+            trace_id=trace_id,
+            enforcement_decision=enforcement_decision_str,
+            execution_result=result,
+        )
+        
+        # Add proof to result
+        result["execution_proof"] = proof.to_dict()
+        
+        return result
+    
     def get_status(self) -> Dict[str, Any]:
         """Get universal gateway status."""
         return {
@@ -673,5 +808,6 @@ class ExecutionService:
             "real_execution": True,
             "enforcement_required": True,
             "device_gateway": self.device_gateway.get_status(),
+            "total_execution_proofs": len(self._execution_proofs),
             "timestamp": datetime.utcnow().isoformat()
         }
