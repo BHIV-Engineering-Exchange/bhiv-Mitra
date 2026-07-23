@@ -7,7 +7,7 @@ const getBaseUrl = () => {
 };
 
 const API_BASE_URL = getBaseUrl();
-const API_KEY = process.env.REACT_APP_API_KEY || 'localtest';
+const API_KEY = process.env.REACT_APP_API_KEY || 'bhiv-enterprise-key';
 const getToken = (): string | null => localStorage.getItem('authToken');
 
 class ApiService {
@@ -95,6 +95,10 @@ class ApiService {
       }
 
       const json = await response.json();
+
+      if (json.status === 'error') {
+        throw new Error(json.error?.message || json.error || 'Backend returned an error');
+      }
 
       // MAPPING: Convert Backend V3 Response to Frontend AssistantResponse
       // Backend returns: { version, status, result: { type, response, task, enforcement, safety }, processed_at }

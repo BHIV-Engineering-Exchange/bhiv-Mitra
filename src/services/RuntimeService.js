@@ -1,7 +1,6 @@
 import { eventBus } from './eventBus.js';
 import { contextStore } from './contextStore.js';
 import { controlPlane } from './controlPlane.js';
-import { capabilityRuntime } from '../mock/capabilityRuntime.js';
 
 export class RuntimeService {
   constructor() {
@@ -12,72 +11,138 @@ export class RuntimeService {
 
   async connectAll() {
     eventBus.emit('health.changed', { status: 'Connecting', latency: 'connecting...' });
-    
-    return new Promise((resolve) => {
-      setTimeout(() => {
+
+    try {
+      const startTime = Date.now();
+      const res = await fetch('http://localhost:8000/health');
+      const duration = Date.now() - startTime;
+
+      if (res.ok) {
         this.status = 'Healthy';
-        this.latency = '42ms';
+        this.latency = `${duration}ms`;
         eventBus.emit('runtime.connected', {});
-        eventBus.emit('health.changed', { status: 'Healthy', latency: '42ms' });
+        eventBus.emit('health.changed', { status: 'Healthy', latency: this.latency });
         this.startHeartbeat();
-        resolve(true);
-      }, 800);
-    });
+        return true;
+      }
+    } catch (e) {
+      this.status = 'Error';
+      eventBus.emit('health.changed', { status: 'Error', latency: '--' });
+    }
+    return false;
   }
 
   startHeartbeat() {
-    // Dynamic health check simulation every 5 seconds
-    setInterval(() => {
-      if (this.status === 'Healthy' || this.status === 'Busy') {
-        const randomLatency = Math.floor(35 + Math.random() * 20) + 'ms';
-        this.latency = randomLatency;
-        eventBus.emit('health.changed', { status: this.status, latency: this.latency });
+    setInterval(async () => {
+      try {
+        const startTime = Date.now();
+        const res = await fetch('http://localhost:8000/health');
+        if (res.ok) {
+          this.latency = `${Date.now() - startTime}ms`;
+          if (this.status !== 'Busy') {
+            this.status = 'Healthy';
+            eventBus.emit('health.changed', { status: this.status, latency: this.latency });
+          }
+        }
+      } catch (e) {
+        this.status = 'Error';
+        eventBus.emit('health.changed', { status: 'Error', latency: '--' });
       }
     }, 5000);
   }
 
-  sendCapabilityRequest(capabilityName) {
+  async sendCapabilityRequest(capabilityName) {
     this.status = 'Busy';
     eventBus.emit('health.changed', { status: 'Busy', latency: this.latency });
+    const startTimestamp = new Date().toLocaleTimeString();
+    eventBus.emit('capability.requested', { capability: capabilityName, timestamp: startTimestamp });
     eventBus.emit('runtime.thinking', {});
 
-    capabilityRuntime.execute(capabilityName);
+    const startTime = Date.now();
+    eventBus.emit('capability.started', { capability: capabilityName, timestamp: startTimestamp });
 
-    // Reset busy status after execution
-    setTimeout(() => {
+    try {
+      if (capabilityName === 'health') {
+        const res = await fetch('http://localhost:8000/health/system');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const durationMs = Date.now() - startTime;
+        eventBus.emit('capability.completed', { capability: capabilityName, duration: `${durationMs}ms`, result: 'System health loaded.' });
+        contextStore.addReplay({ timestamp: new Date().toLocaleTimeString(), capability: capabilityName, status: 'SUCCESS', duration: `${durationMs}ms` });
+        contextStore.addMessage('mitra', `System Health: ${JSON.stringify(data, null, 2)}`);
+      } else if (capabilityName === 'settings') {
+        const res = await fetch('http://localhost:8000/api/metrics/system', {
+          headers: {
+            "X-API-Key": "bhiv-enterprise-key"
+          }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const durationMs = Date.now() - startTime;
+        eventBus.emit('capability.completed', { capability: capabilityName, duration: `${durationMs}ms`, result: 'System settings loaded.' });
+        contextStore.addReplay({ timestamp: new Date().toLocaleTimeString(), capability: capabilityName, status: 'SUCCESS', duration: `${durationMs}ms` });
+        contextStore.addMessage('mitra', `System Metrics: ${JSON.stringify(data, null, 2)}`);
+      } else if (capabilityName === 'replay') {
+        const replays = contextStore.getReplays();
+        const lastReplay = replays[replays.length - 1];
+        if (lastReplay && lastReplay.traceId) {
+          const res = await fetch(`http://localhost:8000/api/replay/${lastReplay.traceId}`, {
+            headers: {
+              "X-API-Key": "bhiv-enterprise-key"
+            }
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          const durationMs = Date.now() - startTime;
+          eventBus.emit('capability.completed', { capability: capabilityName, duration: `${durationMs}ms`, result: 'Replay loaded.' });
+          contextStore.addMessage('mitra', `Replay Data: ${JSON.stringify(data, null, 2)}`);
+        } else {
+          throw new Error('No backend endpoint available for general trace history, and no local trace ID found.');
+        }
+      } else {
+        const data = await controlPlane.sendCapability(capabilityName);
+        const durationMs = Date.now() - startTime;
+        const durationStr = `${(durationMs / 1000).toFixed(1)}s`;
+        const endTimestamp = new Date().toLocaleTimeString();
+
+        const resultText = `Capability [${capabilityName.toUpperCase()}] executed successfully via backend.`;
+
+        eventBus.emit('capability.completed', { capability: capabilityName, duration: durationStr, result: resultText });
+        contextStore.addReplay({ timestamp: endTimestamp, capability: capabilityName, status: 'SUCCESS', duration: durationStr, traceId: data.trace_id });
+        contextStore.addMessage('mitra', `[Capability: ${capabilityName.toUpperCase()}] ${resultText} (Execution time: ${durationStr})`);
+      }
+    } catch (e) {
+      if (e.name === 'AbortError' || e.message.includes('timeout')) {
+        eventBus.emit('capability.timed_out', { capability: capabilityName, error: e.message });
+      } else {
+        eventBus.emit('capability.failed', { capability: capabilityName, error: e.message });
+      }
+      contextStore.addMessage('mitra', `[Capability: ${capabilityName.toUpperCase()}] Failed: ${e.message}`);
+    } finally {
       this.status = 'Healthy';
       eventBus.emit('health.changed', { status: 'Healthy', latency: this.latency });
       eventBus.emit('runtime.idle', {});
-    }, 1600);
+    }
   }
 
-  sendMessage(text) {
+  async sendMessage(text) {
     this.context.addMessage('user', text);
     this.status = 'Busy';
     eventBus.emit('health.changed', { status: 'Busy', latency: this.latency });
     eventBus.emit('runtime.thinking', {});
 
-    controlPlane.simulateResponse(text);
-
-    setTimeout(() => {
+    try {
+      await controlPlane.sendMessage(text);
+    } catch (e) {
+      // error handled in controlPlane
+    } finally {
       this.status = 'Healthy';
       eventBus.emit('health.changed', { status: 'Healthy', latency: this.latency });
       eventBus.emit('runtime.idle', {});
-    }, 1600);
+    }
   }
 
-  simulateFailure() {
-    this.status = 'Error';
-    eventBus.emit('runtime.failed', { reason: 'Network Timeout' });
-    eventBus.emit('health.changed', { status: 'Error', latency: '--' });
 
-    // Auto recover after 3s
-    setTimeout(() => {
-      this.status = 'Healthy';
-      eventBus.emit('runtime.recovered', {});
-      eventBus.emit('health.changed', { status: 'Healthy', latency: '48ms' });
-    }, 3000);
-  }
 }
 
 export const runtimeService = new RuntimeService();

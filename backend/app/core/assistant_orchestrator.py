@@ -350,7 +350,8 @@ def _detect_platform(text_lower: str, intent: Dict[str, Any]) -> str:
         return "whatsapp"
     if "instagram" in text_lower or "insta " in text_lower:
         return "instagram"
-    if "email" in text_lower or "mail" in text_lower:
+    import re
+    if re.search(r'\b(email|mail)\b', text_lower):
         return "email"
     if any(kw in text_lower for kw in ["calendar", "schedule", "meeting", "appointment", "event"]):
         return "calendar"
@@ -589,7 +590,9 @@ async def handle_assistant_request(request):
         
         # ─── Detect platform from text ───
         text_lower = text.lower()
+        logger.info(f"[{trace_id}] PRE-ROUTING: Text='{text_lower}', Intent='{intent.get('intent')}'")
         detected_platform = _detect_platform(text_lower, intent)
+        logger.info(f"[{trace_id}] POST-ROUTING: Detected Platform='{detected_platform}'")
         
         if enforcement_result.get("decision") == "REWRITE":
             response_text = (
@@ -599,10 +602,12 @@ async def handle_assistant_request(request):
                 or "I understand. Let me help you with that in a different way."
             )
             result_type = "passive"
+            logger.info(f"[{trace_id}] ROUTE DECISION: Enforcement Rewrite")
         
         elif detected_platform in ["whatsapp", "email", "telegram", "instagram",
                                      "calendar", "reminder", "ems", "device_gateway"]:
             # ─── UNIVERSAL EXECUTION PATH ───
+            logger.info(f"[{trace_id}] ROUTE DECISION: Workflow execution ({detected_platform})")
             result_type = "workflow"
             action_data = extract_action_parameters(text, detected_platform)
             
@@ -645,7 +650,8 @@ async def handle_assistant_request(request):
                 task = {"task_type": detected_platform, "status": "failed", "error": "missing_parameters"}
                 result_type = "passive"
         
-        elif intent.get("intent") == "general":
+        elif intent.get("intent") in ["general", "summarize", "search"]:
+            logger.info(f"[{trace_id}] ROUTE DECISION: General Chat Request")
             response_text = await generate_generic_response(
                 query=processed_text,
                 context={
@@ -659,6 +665,7 @@ async def handle_assistant_request(request):
             result_type = "passive"
         else:
             try:
+                logger.info(f"[{trace_id}] ROUTE DECISION: Intent-driven task creation")
                 task = task_flow.build_task(intent)
                 response_text = "Task processed successfully"
                 result_type = "workflow"

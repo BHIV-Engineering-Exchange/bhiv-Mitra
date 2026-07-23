@@ -497,11 +497,12 @@ class LocalKnowledgeBase:
         query_lower = query.lower()
         
         # Score each topic by keyword matches
+        import re
         scores: Dict[str, int] = {}
         for topic, data in self.knowledge.items():
             score = 0
             for keyword in data["keywords"]:
-                if keyword in query_lower:
+                if re.search(r'\b' + re.escape(keyword) + r'\b', query_lower):
                     # Longer keywords get more weight
                     score += len(keyword.split())
             if score > 0:
@@ -510,7 +511,18 @@ class LocalKnowledgeBase:
         # Return best matching response
         if scores:
             best_topic = max(scores, key=scores.get)
-            return self.knowledge[best_topic]["response"]
+            response = self.knowledge[best_topic]["response"]
+            
+            # Simple constraint processing for offline mock
+            if "2 lines" in query_lower or "two lines" in query_lower:
+                lines = [line for line in response.split('\n') if line.strip()]
+                return "\n".join(lines[:2])
+            elif "sentence" in query_lower:
+                # Approximate 1 sentence by returning the first line
+                lines = [line for line in response.split('\n') if line.strip()]
+                return lines[0] if lines else response
+                
+            return response
         
         return None
 
@@ -625,7 +637,7 @@ class LLMBridge:
                     else:
                         # Generic helpful response
                         output = (
-                            f"Regarding your question about '{user_query[:50]}...': "
+                            f"[uniguru mock] Regarding your question about '{user_query[:50]}...': "
                             f"I can help with that! While I don't have real-time internet access, "
                             f"I can provide information based on my training data.\n\n"
                             f"Could you be more specific about what aspect you'd like me to explain?"
