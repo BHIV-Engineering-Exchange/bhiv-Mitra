@@ -47,6 +47,7 @@ from app.api.tts import router as tts_router
 from app.api.replay import router as replay_router
 from app.api.metrics import router as metrics_router
 from app.api.ecosystem import router as ecosystem_router
+from app.tantra.api import router as tantra_router
 from app.executors.telegram_executor import TelegramExecutor
 from app.services.reminder_scheduler import ReminderScheduler, SchedulerConfig
 from app.mitra_system_health import get_system_health_snapshot
@@ -266,6 +267,7 @@ app.include_router(tts_router)
 app.include_router(replay_router)
 app.include_router(metrics_router)
 app.include_router(ecosystem_router)
+app.include_router(tantra_router)
 
 # -------------------------------------------------
 # Direct LLM Test Endpoint (bypasses broken routers package)

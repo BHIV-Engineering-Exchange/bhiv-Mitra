@@ -6,6 +6,7 @@ from app.services.audio_service import AudioService
 from app.services.bucket_service import BucketService
 from app.services.enforcement_service import EnforcementService
 from app.services.execution_service import ExecutionService
+from app.tantra.runtime import TantraRuntime
 
 
 class MitraSystemRegistry:
@@ -16,6 +17,7 @@ class MitraSystemRegistry:
         self.execution_service = ExecutionService()
         self.bucket_service = BucketService()
         self.audio_service = AudioService()
+        self.tantra_runtime = TantraRuntime()
 
     def snapshot(self) -> Dict[str, Any]:
         return {
@@ -31,6 +33,7 @@ class MitraSystemRegistry:
             },
             "enforcement": self.enforcement_service.get_status(),
             "execution": self.execution_service.get_status(),
+            "tantra_runtime": self.tantra_runtime.get_status(),
             "bucket": self.bucket_service.get_status(),
             "audio": self.audio_service.get_tts_status()
             if hasattr(self.audio_service, "get_tts_status")

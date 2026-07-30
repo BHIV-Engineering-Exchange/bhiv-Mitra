@@ -1,7 +1,7 @@
 """
 Minimal deterministic trace id generator.
 
-Raj's enforcement engine requires deterministic, replayable trace ids derived from:
+The enforcement engine requires deterministic, replayable trace ids derived from:
 - a canonical input snapshot
 - the final enforcement category
 """

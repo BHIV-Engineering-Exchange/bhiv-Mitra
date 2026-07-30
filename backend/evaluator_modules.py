@@ -1,5 +1,5 @@
 """
-Minimal evaluator module registry for Raj's enforcement engine.
+Minimal evaluator module registry for the enforcement engine.
 
 The enforcement engine expects `ALL_EVALUATORS` to exist and each evaluator to
 return an object with an `action` attribute from: BLOCK | REWRITE | EXECUTE.

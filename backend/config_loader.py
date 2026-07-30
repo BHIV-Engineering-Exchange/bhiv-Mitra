@@ -1,5 +1,5 @@
 """
-Minimal runtime config loader for Raj's enforcement engine.
+Minimal runtime config loader for the enforcement engine.
 
 The deterministic enforcement engine imports `RUNTIME_CONFIG` directly.
 This module provides a small, environment-driven config surface.

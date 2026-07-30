@@ -113,7 +113,7 @@ async def test_spine_wiring():
         print("OK /api/assistant as single entry point")
         print("OK Safety service integration (Aakansha)")
         print("OK Intelligence service integration (Sankalp)")
-        print("OK Enforcement service integration (Raj)")
+        print("OK Enforcement service integration")
         print("OK Execution service integration (Chandresh)")
         print("OK Bucket logging integration (Ashmit)")
         print("OK Trace ID flow through all services")

@@ -4,17 +4,27 @@ import traceback
 from typing import Dict, Any, Optional
 from types import SimpleNamespace
 
+import time as _time
+
 from app.core.summaryflow import summary_flow
 from app.core.intentflow import intent_flow
 from app.core.taskflow import task_flow
 from app.core.respond_service import generate_generic_response
 from app.core.logging import get_logger
+from app.tantra.insightflow import InsightFlow
 
 from app.mitra_system_registry import mitra_registry
 from app.services.mitra_control_plane_service import MitraAuthorityInput, MitraControlPlaneService
 from app.services.multilingual_service import MultilingualService
 from app.external.enforcement.deterministic_trace import (
     generate_trace_id as generate_deterministic_trace_id,
+)
+from app.tantra.contracts import (
+    ExecutionRequest,
+    ExecutionContext,
+    ExecutionDecision,
+    CapabilityType,
+    TraceMetadata,
 )
 
 logger = get_logger(__name__)
@@ -31,6 +41,7 @@ CRISIS_SAFE_RESPONSE = (
 # Initialize services via the central registry (single shared instances)
 bucket_service = mitra_registry.bucket_service
 execution_service = mitra_registry.execution_service
+tantra_runtime = mitra_registry.tantra_runtime
 multilingual_service = MultilingualService()
 audio_service = mitra_registry.audio_service
 mitra_control_plane_service = MitraControlPlaneService()
@@ -431,6 +442,15 @@ async def handle_assistant_request(request):
         # -------------------------------
         # Input normalization & logging
         # -------------------------------
+        pipeline_start = _time.time()
+
+        # InsightFlow: record request received
+        _chat_events = []
+        _chat_events.append(InsightFlow.on_chat_received(
+            trace_id=trace_id,
+            platform=getattr(request.context, "platform", "web"),
+            detected_language=locals().get("detected_language", "en"),
+        ))
         
         # Handle audio input if provided (skip placeholder values from Swagger UI)
         audio_data = getattr(request.input, 'audio_data', None)
@@ -602,19 +622,52 @@ async def handle_assistant_request(request):
         
         elif detected_platform in ["whatsapp", "email", "telegram", "instagram",
                                      "calendar", "reminder", "ems", "device_gateway"]:
-            # ─── UNIVERSAL EXECUTION PATH ───
+            # ─── TANTRA EXECUTION PATH (sole execution runtime) ───
             result_type = "workflow"
             action_data = extract_action_parameters(text, detected_platform)
-            
+
             if action_data:
-                logger.info(f"[{trace_id}] Executing {detected_platform} action")
-                execution_result = execution_service.execute_action(
-                    action_type=detected_platform,
-                    action_data=action_data,
-                    trace_id=trace_id,
-                    enforcement_decision=enforcement_result
+                logger.info(f"[{trace_id}] Executing {detected_platform} action via TANTRA Runtime")
+
+                # Build TANTRA execution context from orchestrator state
+                tantra_context = ExecutionContext(
+                    platform=getattr(request.context, "platform", "web"),
+                    device=getattr(request.context, "device", "unknown"),
+                    session_id=getattr(request.context, "session_id", "") or "",
+                    user_id=str(authenticated_user_context.get("principal") or trace_id),
+                    voice_input=bool(getattr(request.context, "voice_input", False)),
+                    preferred_language=getattr(request.context, "preferred_language", "auto"),
+                    detected_language=detected_language,
+                    enforcement_decision=ExecutionDecision(
+                        enforcement_result.get("decision", "BLOCK")
+                    ),
+                    enforcement_reason_code=enforcement_result.get("reason_code", ""),
+                    enforcement_scope=enforcement_result.get("scope", "both"),
+                    policy_decision=policy_decision,
+                    rl_signal=(mitra_contract.get("rl_signal") if mitra_contract else None),
+                    bhiv_context=authority_result.get("bhiv_context"),
+                    authenticated_user_context=authenticated_user_context,
+                    bucket_log_reference=authority_result.get("bucket_log_reference"),
                 )
-                log_to_bucket(trace_id, "action_execution", execution_result)
+
+                # Build TANTRA execution request (canonical contract)
+                tantra_request = ExecutionRequest(
+                    trace_metadata=TraceMetadata(
+                        trace_id=trace_id,
+                        source="mitra_orchestrator",
+                        started_at=datetime.utcnow().isoformat(),
+                    ),
+                    context=tantra_context,
+                    capability_type=CapabilityType(detected_platform),
+                    action=action_data.get("action", "execute"),
+                    payload=action_data,
+                    action_data=action_data,
+                )
+
+                # Execute through TANTRA — the sole execution runtime
+                tantra_result = tantra_runtime.execute(tantra_request)
+                execution_result = tantra_result.to_legacy_dict()
+                log_to_bucket(trace_id, "tantra_execution", execution_result)
                 
                 platform_labels = {
                     "whatsapp": "WhatsApp message",
@@ -732,7 +785,29 @@ async def handle_assistant_request(request):
             "final_response": final_response,
             "chain_complete": True
         })
-        
+
+        # InsightFlow: record chat completed (non-TANTRA path)
+        chat_latency_ms = (_time.time() - pipeline_start) * 1000
+        _chat_events.append(InsightFlow.on_chat_completed(
+            trace_id=trace_id,
+            response_length=len(final_response_text) if final_response_text else 0,
+            latency_ms=chat_latency_ms,
+            provider="llm_bridge",
+            intent=intent.get("intent", "general") if isinstance(intent, dict) else "general",
+        ))
+        try:
+            chat_insight = InsightFlow.build_chat_record(
+                trace_id=trace_id,
+                events=_chat_events,
+                started_at=datetime.utcnow().isoformat(),
+                completed_at=datetime.utcnow().isoformat(),
+                total_latency_ms=chat_latency_ms,
+                status="completed",
+            )
+            log_to_bucket(trace_id, "chat_insightflow", chat_insight.to_dict())
+        except Exception as insight_err:
+            logger.warning(f"[{trace_id}] Chat InsightFlow logging failed: {insight_err}")
+
         logger.info(f"[{trace_id}] Request processing complete")
         return final_response
         
@@ -740,6 +815,25 @@ async def handle_assistant_request(request):
         # Log the actual error for debugging
         error_trace = traceback.format_exc()
         logger.error(f"[{trace_id}] Error processing assistant request: {e}\n{error_trace}")
+
+        # InsightFlow: record chat failed
+        try:
+            _chat_events.append(InsightFlow.on_chat_failed(
+                trace_id=trace_id,
+                error_type=type(e).__name__,
+                error_message=str(e),
+            ))
+            chat_insight = InsightFlow.build_chat_record(
+                trace_id=trace_id,
+                events=_chat_events,
+                started_at=datetime.utcnow().isoformat(),
+                completed_at=datetime.utcnow().isoformat(),
+                total_latency_ms=(_time.time() - pipeline_start) * 1000 if 'pipeline_start' in dir() else 0,
+                status="failed",
+            )
+            log_to_bucket(trace_id, "chat_insightflow", chat_insight.to_dict())
+        except Exception:
+            pass
         
         log_to_bucket(trace_id, "error_occurred", {
             "error": str(e),

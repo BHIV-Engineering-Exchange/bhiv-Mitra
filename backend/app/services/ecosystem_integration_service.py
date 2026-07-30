@@ -2,8 +2,8 @@
 MITRA Ecosystem Integration Service
 -----------------------------------
 Provides live runtime integration proofs for all BHIV products.
-Demonstrates actual integration with Raj's execution runtime,
-Pratham's Companion Runtime, and all ecosystem products.
+Demonstrates actual integration with the TANTRA execution runtime
+and all ecosystem products.
 """
 
 from __future__ import annotations
