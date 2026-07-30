@@ -19,10 +19,13 @@ class MitraCompanion extends HTMLElement {
   }
 
   render() {
-    // Inject stylesheet
+    // Resolve stylesheet path: prefer the `stylesheet-path` attribute, fallback to URL depth detection
+    const attrPath = this.getAttribute('stylesheet-path');
+    const autoPrefx = window.location.pathname.includes('/pages/') ? '../' : './';
+    const cssHref = attrPath || `${autoPrefx}styles/mitra-companion.css`;
     const styleLink = document.createElement('link');
     styleLink.setAttribute('rel', 'stylesheet');
-    styleLink.setAttribute('href', '../styles/mitra-companion.css');
+    styleLink.setAttribute('href', cssHref);
     this.shadowRoot.appendChild(styleLink);
 
     // Shell container

@@ -1,28 +1,27 @@
-# TANTRA Runtime & Constitutional Convergence for MITRA
+# DEP Metadata — MITRA Universal Hover Companion
 
-## Metadata
+| Field             | Value                                             |
+|-------------------|---------------------------------------------------|
+| **Project**       | MITRA Universal Hover Companion                   |
+| **Phase**         | Phase 1 Convergence                               |
+| **Owner**         | Ashwini Wadekar                                   |
+| **Sprint**        | AI-Augmented Execution Sprint (8–12 hrs)          |
+| **Repository**    | MITRA-Universal-Companion                         |
+| **Stack**         | Vanilla JS (Web Components) + Python/FastAPI      |
+| **Created**       | 2026-07-29                                        |
+| **Last Updated**  | 2026-07-30                                        |
 
-| Field | Value |
-|-------|-------|
-| **Project** | MITRA – Phase 1 Convergence |
-| **Module** | TANTRA Runtime |
-| **Sprint** | AI-Augmented Execution Sprint |
-| **Status** | Complete |
-| **Owner** | Ashmit Pandey |
-| **Date** | 2026-07-29 |
-| **Version** | 1.0.0 |
+## Scope
 
-## Objective
+Build the one canonical MITRA Companion that follows the user across the entire BHIV ecosystem. MITRA should feel like the operating system companion — not a feature inside one application.
 
-Make TANTRA the one and only execution runtime for MITRA. Every MITRA request must execute through the constitutional flow with complete traceability and replay.
+## Integration Dependencies
 
-## Constitutional Flow
-
-```
-User -> MITRA -> Control Plane -> TANTRA Runtime -> Capability Runtime
--> Execution -> Bucket -> Replay -> InsightFlow -> MITRA Response
-```
-
-## Key Principle
-
-No MITRA request should bypass TANTRA. Every execution must be governed, replayable and observable.
+| Team Member    | Role                          | API Contract                        |
+|----------------|-------------------------------|-------------------------------------|
+| Raj Prajapati  | MITRA Control Plane           | `/api/assistant`, `/api/mitra/*`    |
+| Ashmit         | TANTRA Runtime                | Event stream for execution state    |
+| Kanishk        | Universal Capability Runtime  | Capability lifecycle events         |
+| Pratham        | Production Runtime            | Deployment validation               |
+| Vijay Dhawan   | UniGuru Backend               | Intelligence APIs via Raj           |
+| Isha           | UniGuru Integration           | Cross-product continuity validation |

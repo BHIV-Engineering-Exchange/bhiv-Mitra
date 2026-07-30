@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - MITRA Universal Companion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/mitra-companion.css">
+    <style>
+        /* Using similar styles from Login.html for consistency */
+        /* Using styles from login.html for consistency */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0B0B0F;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(108, 92, 231, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(108, 92, 231, 0.08) 0%, transparent 40%);
+            color: #FFFFFF;
+            display: flex;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+            padding: 84px 20px 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            background: #15151D;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 520px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .auth-container {
+                padding: 24px;
+            }
+        }
+
+        .logo-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .mitra-logo {
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .logo-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .logo-header p {
+            font-size: 14px;
+            color: #A1A1AA;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #A1A1AA;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.25s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: #6C5CE7;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+        }
+
+        .error-message {
+            font-size: 12px;
+            color: #ff4d4f;
+            margin-top: 6px;
+            min-height: 16px;
+            display: none;
+        }
+
+        .password-strength {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+            height: 4px;
+        }
+        .strength-bar {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            transition: background-color 0.3s;
+        }
+        .strength-bar.filled.weak { background-color: #ff4d4f; }
+        .strength-bar.filled.medium { background-color: #faad14; }
+        .strength-bar.filled.strong { background-color: #52c41a; }
+
+        .terms-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #A1A1AA;
+        }
+        .terms-group input {
+            accent-color: #6C5CE7;
+            cursor: pointer;
+        }
+        .terms-group a {
+            color: #6C5CE7;
+            text-decoration: none;
+        }
+        .terms-group a:hover {
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            height: 48px;
+            background: #6C5CE7;
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 0 0 1px rgba(108, 92, 231, 0.5);
+            transition: all 0.25s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #5a4bd9;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 0 0 1px rgba(108, 92, 231, 0.7);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .divider span {
+            padding: 0 12px;
+        }
+
+        .social-btn {
+            width: 100%;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .auth-footer-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #A1A1AA;
+        }
+
+        .auth-footer-link a {
+            color: #6C5CE7;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer-link a:hover {
+            text-decoration: underline;
+        }
+
+        .toast-notification {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            padding: 14px 24px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-notification.success {
+            background: rgba(0, 230, 118, 0.95);
+            color: #000000;
+        }
+
+        .toast-notification.error {
+            background: rgba(255, 23, 68, 0.95);
+            color: #ffffff;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <mitra-navbar></mitra-navbar>
+    <script type="module" src="src/components/Navbar.js"></script>
+    <div id="toast" class="toast-notification"></div>
+
+    <div class="auth-container">
+        <div class="logo-header">
+            <div class="mitra-logo">MITRA</div>
+            <h1>Create an Account</h1>
+            <p>Join the BHIV Ecosystem</p>
+        </div>
+
+        <form id="signupForm" novalidate>
+            <div class="form-group">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" id="name" class="form-input" placeholder="Your full name" required autocomplete="name">
+                <div id="nameError" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="you@example.com" required autocomplete="email">
+                <div id="emailError" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" class="form-input" placeholder="Create a strong password" required autocomplete="new-password">
+                <div class="password-strength">
+                    <div class="strength-bar"></div>
+                    <div class="strength-bar"></div>
+                    <div class="strength-bar"></div>
+                    <div class="strength-bar"></div>
+                </div>
+                <div id="passwordError" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Re-enter your password" required autocomplete="new-password">
+                <div id="confirmPasswordError" class="error-message"></div>
+            </div>
+
+            <div class="terms-group">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">I agree to the <a href="#">Terms of Service</a></label>
+            </div>
+
+            <button type="submit" id="submitBtn" class="submit-btn">
+                <span class="spinner" id="btnSpinner"></span>
+                <span id="btnText">Create Account</span>
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>Or sign up with</span>
+        </div>
+
+        <button type="button" id="googleBtn" class="social-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.94 11c-.1-2.5-1-4.8-2.6-6.6-1.6-1.8-3.8-3-6.3-3s-4.7 1.2-6.3 3c-1.6 1.8-2.5 4.1-2.6 6.6h17.8z"/><path d="M3.06 13c.1 2.5 1 4.8 2.6 6.6 1.6 1.8 3.8 3 6.3 3s4.7-1.2 6.3-3c1.6-1.8 2.5-4.1 2.6-6.6H3.06z"/><path d="M12 4.1v15.8"/><path d="M3.1 12h17.8"/></svg>
+            Sign up with Google
+        </button>
+
+        <button type="button" id="microsoftBtn" class="social-btn" style="margin-top: 12px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 21 21"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>
+            Sign up with Microsoft
+        </button>
+
+        <div class="auth-footer-link">
+            Already have an account? <a href="login.html">Sign In</a>
+        </div>
+    </div>
+
+    <!-- MITRA Companion Integration -->
+    <mitra-companion
+        stylesheet-path="styles/mitra-companion.css"
+        api-base-url="http://localhost:8000">
+    </mitra-companion>
+
+    <!-- Scripts -->
+    <script type="module">
+        const form = document.getElementById('signupForm');
+        const nameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const termsCheckbox = document.getElementById('terms');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const btnText = document.getElementById('btnText');
+        const toast = document.getElementById('toast');
+        const nameError = document.getElementById('nameError');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const confirmPasswordError = document.getElementById('confirmPasswordError');
+        const googleBtn = document.getElementById('googleBtn');
+        const microsoftBtn = document.getElementById('microsoftBtn');
+        const strengthBars = document.querySelectorAll('.strength-bar');
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `toast-notification ${type} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        function checkPasswordStrength(password) {
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            
+            strengthBars.forEach((bar, i) => {
+                bar.className = 'strength-bar';
+                if (i < score) {
+                    bar.classList.add('filled');
+                    if (score <= 2) bar.classList.add('weak');
+                    else if (score <= 4) bar.classList.add('medium');
+                    else bar.classList.add('strong');
+                }
+            });
+            return score;
+        }
+
+        function clearErrors() {
+            [nameError, emailError, passwordError, confirmPasswordError].forEach(el => {
+                if (el) { el.textContent = ''; el.style.display = 'none'; }
+            });
+            [nameInput, emailInput, passwordInput, confirmPasswordInput].forEach(el => {
+                if (el) el.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+            });
+        }
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', () => {
+                checkPasswordStrength(passwordInput.value);
+            });
+        }
+
+        form.addEventListener('input', clearErrors);
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearErrors();
+
+            let isValid = true;
+            const nameVal = nameInput.value.trim();
+            const emailVal = emailInput.value.trim();
+            const passwordVal = passwordInput.value;
+            const confirmPasswordVal = confirmPasswordInput.value;
+
+            if (!nameVal) {
+                nameError.textContent = 'Full name is required.';
+                nameError.style.display = 'block';
+                nameInput.style.borderColor = '#ff4d4f';
+                isValid = false;
+            }
+
+            if (!emailVal || !validateEmail(emailVal)) {
+                emailError.textContent = emailVal ? 'Please enter a valid email address.' : 'Email is required.';
+                emailError.style.display = 'block';
+                emailInput.style.borderColor = '#ff4d4f';
+                isValid = false;
+            }
+
+            let strength = checkPasswordStrength(passwordVal);
+            let passwordErrorMessage = '';
+            if (passwordVal.length < 8) {
+                passwordErrorMessage = 'Password must be at least 8 characters. ';
+            } else if (strength < 3) {
+                passwordErrorMessage = 'Include uppercase, lowercase, and numbers. ';
+            }
+
+            if (passwordErrorMessage) {
+                passwordError.textContent = passwordErrorMessage;
+                passwordError.style.display = 'block';
+                passwordInput.style.borderColor = '#ff4d4f';
+                isValid = false;
+            }
+
+            if (passwordVal !== confirmPasswordVal) {
+                confirmPasswordError.textContent = 'Passwords do not match.';
+                confirmPasswordError.style.display = 'block';
+                confirmPasswordInput.style.borderColor = '#ff4d4f';
+                isValid = false;
+            }
+
+            if (!termsCheckbox.checked) {
+                showToast('You must agree to the Terms of Service.', 'error');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Submit UI state
+            submitBtn.disabled = true;
+            btnSpinner.style.display = 'inline-block';
+            btnText.textContent = 'Creating Account...';
+
+            // Simulate API call delay for account creation
+            setTimeout(() => {
+                // Persist session so navbar shows user name
+                const nameVal = nameInput ? nameInput.value.trim() : '';
+                const emailVal2 = emailInput ? emailInput.value.trim() : '';
+                const displayName = nameVal || emailVal2.split('@')[0];
+                localStorage.setItem('mitra_user', JSON.stringify({ name: displayName, email: emailVal2 }));
+                localStorage.setItem('mitra_token', 'demo-token-' + Date.now());
+
+                showToast('Account created successfully!', 'success');
+
+                // Re-enable button and hide spinner before redirecting
+                submitBtn.disabled = false;
+                btnSpinner.style.display = 'none';
+                btnText.textContent = 'Create Account';
+                
+                // Redirect to the dashboard after a short delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+
+            }, 1500);
+        });
+
+        googleBtn.addEventListener('click', () => {
+            showToast('Google OAuth is pending backend provider config.', 'error');
+        });
+
+        microsoftBtn.addEventListener('click', () => {
+            showToast('Microsoft OAuth is pending backend provider config.', 'error');
+        });
+    </script>
+</body>
+</html>

@@ -1,38 +1,22 @@
-# Governance Contract (GC)
+# GC — Governance Compliance
 
-## Constitutional Principles
+## Architecture Compliance
 
-1. **Sole Execution Runtime**: TANTRA is the ONLY execution runtime for MITRA. No direct execution paths are permitted.
+| Principle                                | Compliant | Notes                                                            |
+|------------------------------------------|-----------|------------------------------------------------------------------|
+| No frontend orchestration               | ✅ Yes    | All logic proxied through `controlPlane.js` → backend `/api/assistant` |
+| No local execution logic                | ✅ Yes    | Capabilities dispatched to backend via `/api/mitra/evaluate`     |
+| No direct LLM integrations in frontend  | ✅ Yes    | Frontend never calls OpenAI/Groq/Gemini directly                |
+| Intelligence from UniGuru via Raj        | ⚠️ Partial | Frontend correctly routes through Raj. Backend `llm_bridge.py` calls LLM providers directly — this is Raj's responsibility |
+| Execution state from TANTRA             | ⚠️ Partial | `ActivityIndicator` + `ExecutionStatusPanel` handle events. Real-time stream from TANTRA not yet available |
+| Single canonical component              | ✅ Yes    | One `<mitra-companion>` Web Component, zero product-specific forks |
+| Session ID sent on every request        | ✅ Yes    | `controlPlane.js` includes `session_id` from `contextStore`     |
+| No UI paths that bypass runtime         | ✅ Yes    | All message/capability paths go through `RuntimeService` → `controlPlane` → backend |
 
-2. **Fail-Closed**: Missing enforcement verdict → BLOCK. Missing bucket artifact → BLOCK. Kill switch → TERMINATE.
+## Security
 
-3. **Immutable Policy**: RL signals can adjust confidence but never override enforcement decisions.
-
-4. **Gateway Auth**: Every executor call requires an HMAC-signed gateway token from TANTRA.
-
-5. **Complete Traceability**: Every execution generates a deterministic SHA-256 trace_id that follows it through every stage.
-
-6. **Bucket as Truth**: MongoDB stores every stage with integrity hashes for replay and governance.
-
-7. **Observability**: No execution is invisible. InsightFlow captures every lifecycle event.
-
-## Registry Participation
-
-TANTRA integrates with constitutional registries as a governed orchestration layer:
-- **Execution Registry**: Records every execution attempt
-- **Capability Registry**: Validates capability availability
-- **Replay Registry**: Stores replay metadata
-- **Review Registry**: Tracks governance review states
-
-TANTRA does NOT own these registries — it orchestrates through them.
-
-## Enforcement Hierarchy
-
-```
-EnforcementVerdict (frozen dataclass)
-  -> TANTRA Runtime (applies verdict)
-    -> Capability Executor (validates gateway auth)
-      -> Platform Executor (real-world action)
-```
-
-No component may override the enforcement verdict.
+| Check                   | Status  | Detail                                                    |
+|-------------------------|---------|-----------------------------------------------------------|
+| API key in requests     | ✅ Yes  | `X-API-Key` header sent on every backend call             |
+| Shadow DOM isolation    | ✅ Yes  | Companion uses `attachShadow({ mode: 'open' })`          |
+| User input sanitization | ✅ Yes  | `MessageRenderer.escapeForRole()` escapes user input HTML |

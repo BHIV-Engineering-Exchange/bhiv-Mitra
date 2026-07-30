@@ -39,7 +39,22 @@ export class HealthPanel {
 
   updateHealth(data) {
     if (data.status) {
-      this.statusEl.className = `status-indicator ${data.status}`;
+      const statusMap = {
+        'Healthy': 'green',
+        'Connected': 'green',
+        'Completed': 'green',
+        'Busy': 'yellow',
+        'Connecting': 'yellow',
+        'Thinking': 'yellow',
+        'Executing': 'yellow',
+        'Waiting': 'yellow',
+        'Retrying': 'yellow',
+        'Error': 'red',
+        'Failed': 'red',
+        'Disconnected': 'red'
+      };
+      const colorClass = statusMap[data.status] || 'yellow';
+      this.statusEl.className = `status-indicator ${colorClass}`;
       this.statusEl.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
     }
     if (data.latency) this.latencyEl.textContent = data.latency;

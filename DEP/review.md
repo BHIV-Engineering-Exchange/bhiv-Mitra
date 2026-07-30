@@ -1,46 +1,36 @@
-# Review Packet
+# Review — MITRA Phase 1 Convergence
 
-## Code Review Summary
+## Review Summary
 
-### New Files Created
+| Criterion                                                    | Met?       |
+|--------------------------------------------------------------|------------|
+| MITRA appears identically in every VM-hosted BHIV product    | ✅ Yes     |
+| Companion visible on Login, Signup, authenticated sessions   | ✅ Yes     |
+| Session continues between Gurukul, Samruddhi, SETU           | ⚠️ Same-origin only |
+| All intelligence from UniGuru through Raj's Control Plane    | ✅ Frontend compliant |
+| All execution state from TANTRA and Kanishk's Runtime        | ⚠️ Event handlers ready, stream not available |
+| No frontend execution logic or direct LLM integration        | ✅ Yes     |
+| Complete DEP and Evidence Packet submitted                   | ✅ Yes     |
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/tantra/__init__.py` | 45 | Package exports |
-| `app/tantra/contracts.py` | 340 | Canonical execution contracts |
-| `app/tantra/runtime.py` | 380 | Sole execution engine |
-| `app/tantra/state_machine.py` | 130 | Deterministic lifecycle |
-| `app/tantra/governance.py` | 280 | Runtime governance |
-| `app/tantra/registry.py` | 250 | Constitutional registry integration |
-| `app/tantra/insightflow.py` | 230 | Observability telemetry |
-| `app/tantra/api.py` | 95 | FastAPI endpoints |
+## Architectural Review
 
-### Modified Files
+The MITRA Companion is built as a single Web Component (`<mitra-companion>`) using the Custom Elements API with Shadow DOM encapsulation. This guarantees:
 
-| File | Change |
-|------|--------|
-| `app/mitra_system_registry.py` | Added TANTRA Runtime to registry |
-| `app/core/assistant_orchestrator.py` | Routes execution through TANTRA |
-| `app/main.py` | Registered TANTRA API router |
+1. **Zero style leakage** — companion styles never affect the host product page.
+2. **Drop-in integration** — any product embeds MITRA with two lines (one `<mitra-companion>` tag, one `<script>` tag).
+3. **No framework dependency** — works in any HTML page regardless of whether the host uses React, Vue, Angular, or plain HTML.
 
-### Architecture Integrity
+## Code Quality
 
-- **No breaking changes** to existing API contracts
-- **Legacy compatibility** via `ExecutionResult.to_legacy_dict()`
-- **Existing executors** wrapped behind TANTRA capability interface
-- **Bucket integration** preserved with additional TANTRA stages
-- **Enforcement flow** unchanged — TANTRA applies the same verdicts
+- All services follow single-responsibility: `RuntimeService` handles connection lifecycle, `controlPlane` handles API calls, `contextStore` handles persistence, `eventBus` handles decoupled communication.
+- Canonical `<mitra-companion>` Web Component uses a dynamic stylesheet path (reads `stylesheet-path` attribute or auto-detects depth) — works correctly at root AND in `pages/` subdirectory.
+- `HealthPanel` status indicator colours now correctly map backend status strings (`Healthy`, `Error`, `Busy`, etc.) to CSS classes (`green`, `yellow`, `red`).
+- `ActivityIndicator` now covers all 7 Phase 4 runtime states: Thinking, Executing, Capability Running, Waiting, Completed, Failed, Retrying.
+- `<mitra-navbar>` Web Component deployed on all pages: `index.html`, `login.html`, `signup.html`, `dashboard.html`, `pages/uniguru.html`, `pages/gurukul.html`, `pages/samruddhi.html`, `pages/setu.html`.
+- `localStorage` session storage persists on both login and signup so the navbar shows authenticated user name everywhere.
+- No duplicate files or pages created.
+- All bugs from the architectural audit (R6, R15, R21) have been fixed.
 
-### Security Review
+## Open Items for Next Phase
 
-- Gateway Auth tokens still required for every executor call
-- HMAC signing unchanged
-- No new attack surface introduced
-- Rate limiting preserved
-- JWT authentication preserved
-
-### Testing Considerations
-
-- All existing tests should pass without modification
-- TANTRA adds a layer without changing behavior
-- New integration tests needed for TANTRA-specific paths
+See `next_tasks.md` and `blockers.md`.

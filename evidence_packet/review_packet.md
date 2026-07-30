@@ -1,35 +1,75 @@
-# Review Packet — TANTRA Phase 1 Convergence
+# Review Packet — MITRA Universal Hover Companion
+## Phase 1 Convergence | Ashwini Wadekar
 
-## Scope
+---
 
-Complete implementation of TANTRA as the sole execution runtime for MITRA.
+## What Was Built
 
-## Files Changed
+A single canonical `<mitra-companion>` Web Component that can be embedded into any BHIV product with two HTML lines:
 
-### New Files (8)
-1. `backend/app/tantra/__init__.py` — Package initialization and exports
-2. `backend/app/tantra/contracts.py` — Canonical execution contracts
-3. `backend/app/tantra/runtime.py` — Sole execution engine
-4. `backend/app/tantra/state_machine.py` — Execution lifecycle state machine
-5. `backend/app/tantra/governance.py` — Runtime governance
-6. `backend/app/tantra/registry.py` — Constitutional registry integration
-7. `backend/app/tantra/insightflow.py` — InsightFlow telemetry
-8. `backend/app/tantra/api.py` — TANTRA API endpoints
+```html
+<mitra-companion
+    stylesheet-path="../styles/mitra-companion.css"
+    api-base-url="http://localhost:8000">
+</mitra-companion>
+<script type="module" src="../src/mitra-companion.js"></script>
+```
 
-### Modified Files (3)
-1. `backend/app/mitra_system_registry.py` — Added TANTRA Runtime
-2. `backend/app/core/assistant_orchestrator.py` — Routes through TANTRA
-3. `backend/app/main.py` — Registered TANTRA router
+---
 
-## Architecture Impact
+## Component Inventory
 
-- **Backward Compatible**: Existing API contracts unchanged
-- **Non-Breaking**: Legacy compatibility via `to_legacy_dict()`
-- **Additive Layer**: TANTRA adds governance without changing behavior
-- **No New Dependencies**: Uses existing Python packages
+| Component             | File                          | Purpose                                      |
+|-----------------------|-------------------------------|----------------------------------------------|
+| Hover Companion       | `MITRAButton.js`              | Floating action button; pulse animation      |
+| Chat Panel            | `ConversationPanel.js`        | Message history, localStorage persistence    |
+| Message Renderer      | `MessageRenderer.js`          | Role-aware message bubble factory            |
+| Execution Status Panel| `ExecutionStatusPanel.js`     | Unified health + activity (all 7 states)     |
+| Notification Component| `NotificationCenter.js` + `NotificationBadge.js` | Toast toasts + FAB badge counter |
+| Companion Header      | `Header.js`                   | Minimize, dock toggle                        |
+| Companion Window      | `MITRAWindow.js`              | Main shell, assembles all components         |
 
-## Testing
+---
 
-- All existing endpoint contracts preserved
-- TANTRA adds observability without changing behavior
-- Integration tests recommended for TANTRA-specific paths
+## Integration Status Per Product
+
+| Product    | Login | Signup | Dashboard | MITRA Embedded |
+|------------|-------|--------|-----------|----------------|
+| Gurukul    | ✅    | ✅     | ✅        | ✅             |
+| Samruddhi  | ✅    | ✅     | ✅        | ✅             |
+| SETU       | ✅    | ✅     | ✅        | ✅             |
+
+Login and Signup are shared across all products via `login.html` and `signup.html`.
+
+---
+
+## Backend API Contract (Consumed)
+
+All requests route through the backend. No direct LLM calls from the frontend.
+
+| Endpoint              | Method | Called By          | Purpose                          |
+|-----------------------|--------|--------------------|----------------------------------|
+| `/health`             | GET    | `RuntimeService`   | Connection heartbeat (5s interval)|
+| `/api/assistant`      | POST   | `controlPlane`     | Send user messages               |
+| `/api/mitra/evaluate` | POST   | `controlPlane`     | Trigger capability execution     |
+
+Request payload always includes `session_id` from `contextStore`.
+
+---
+
+## Bugs Fixed During This Sprint
+
+| Bug | File | Fix Applied |
+|-----|------|-------------|
+| `src/config.js` missing — breaking import | `RuntimeService.js`, `controlPlane.js` | Created `src/config.js` |
+| `http.localhost:8000` URL typo | `pages/uniguru.html` | Fixed to `http://localhost:8000` |
+| `addMessage()` called with wrong signature | `ConversationPanel.js:24` | Fixed to `addMessage('mitra', message)` |
+| `samruddhi.html` missing | `pages/` | Created `pages/samruddhi.html` |
+
+---
+
+## Reviewer Notes
+
+> The canonical review process states: *"Only the contents of the code_packet/ folder and supporting evidence will be reviewed unless a deeper repository inspection is specifically requested."*
+
+All code changes are documented in `code_packet/`. Screenshots are in `screenshots/`. Runtime logs and API samples are in their respective directories.
