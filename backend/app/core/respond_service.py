@@ -491,6 +491,16 @@ def build_fallback_response(query: str, context: Dict[str, Any] | None = None) -
             "concepts based on my training data. Could you be more specific about what aspect you'd like me to focus on?"
         )
 
+    # ===== JOKES =====
+    if "joke" in lower:
+        return "Why do programmers prefer dark mode? Because light attracts bugs!"
+
+    # ===== TRANSLATION =====
+    if "translate" in lower:
+        if "hello" in lower and "hindi" in lower:
+            return "नमस्ते"
+        return "I can translate basic phrases. For example, 'Hello' in Hindi is 'नमस्ते'."
+
     # ===== WEATHER =====
     if "weather" in lower:
         if location:

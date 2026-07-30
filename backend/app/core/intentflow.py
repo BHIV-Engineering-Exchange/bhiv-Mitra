@@ -44,8 +44,9 @@ class IntentFlow:
         for intent, keywords in self.intent_patterns.items():
             if intent == 'general':
                 continue
-            if any(keyword in text_lower for keyword in keywords):
-                return intent
+            for keyword in keywords:
+                if re.search(r'\b' + re.escape(keyword) + r'\b', text_lower):
+                    return intent
 
         return 'general'  # fallback
 
