@@ -55,6 +55,6 @@ services:
       - key: GROQ_API_KEY
         sync: false
       - key: FRONTEND_URL
-        sync: false
+        value: https://mitra-t42.vercel.app
       - key: UNIGURU_API_KEY
         sync: false

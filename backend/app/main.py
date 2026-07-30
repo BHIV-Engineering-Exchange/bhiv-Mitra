@@ -174,6 +174,8 @@ def _get_allowed_origins() -> list[str]:
     render_frontends = [
         "https://ai-assistant-yykb.onrender.com",
         "https://ai-assistant-frontend.onrender.com",
+        "https://mitra-t42.vercel.app",
+        "http://mitra-t42.vercel.app",
     ]
     origins.extend(render_frontends)
     return list(set(origins))
