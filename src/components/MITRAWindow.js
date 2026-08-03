@@ -4,6 +4,8 @@ import { Footer } from './Footer.js';
 import { CapabilityLauncher } from './CapabilityLauncher.js';
 import { HealthPanel } from './HealthPanel.js';
 import { ActivityIndicator } from './ActivityIndicator.js';
+import { renderAvatarElement } from '../services/avatarHelper.js';
+import { contextStore } from '../services/contextStore.js';
 
 export class MITRAWindow {
   constructor(runtimeService, eventBus, dockController) {
@@ -20,8 +22,22 @@ export class MITRAWindow {
       () => {
         // Toggle health panel
         this.healthPanel.toggle();
+      },
+      () => {
+        this.eventBus.emit('avatar.request_change');
       }
     );
+
+    // Listen for avatar changes
+    this.eventBus.on('avatar.changed', (data) => {
+      this.header.updateAvatar(data.avatar, renderAvatarElement);
+    });
+
+    // Initialize with current avatar
+    const initialAvatar = contextStore.getAvatar();
+    if (initialAvatar) {
+      this.header.updateAvatar(initialAvatar, renderAvatarElement);
+    }
 
     this.healthPanel = new HealthPanel(eventBus);
     

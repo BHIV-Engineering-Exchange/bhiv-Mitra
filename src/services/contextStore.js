@@ -15,7 +15,15 @@ export class ContextStore {
     try {
       const stored = localStorage.getItem(this.storageKey);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        return {
+          history: [],
+          dockMode: 'floating',
+          replays: [],
+          avatar: null,
+          position: null,
+          ...parsed
+        };
       }
     } catch (e) {
       console.warn('[MITRA] Failed to load context from localStorage', e);
@@ -23,7 +31,9 @@ export class ContextStore {
     return {
       history: [],
       dockMode: 'floating',
-      replays: []
+      replays: [],
+      avatar: null,
+      position: null
     };
   }
 
@@ -62,12 +72,35 @@ export class ContextStore {
   }
 
   setDockMode(mode) {
-    this.state.dockMode = mode;
+    if (!mode) return;
+    const validMode = (mode === 'left' || mode === 'right' || mode === 'floating') ? mode : 'floating';
+    this.state.dockMode = validMode;
     this.saveState();
   }
 
   getDockMode() {
     return this.state.dockMode || 'floating';
+  }
+
+  setAvatar(avatarDataUrl) {
+    this.state.avatar = avatarDataUrl;
+    this.saveState();
+    eventBus.emit('avatar.changed', { avatar: avatarDataUrl });
+  }
+
+  getAvatar() {
+    return this.state.avatar || null;
+  }
+
+  setPosition(position) {
+    if (!position || position.left == null || position.top == null) return;
+    this.state.position = position;
+    this.saveState();
+    eventBus.emit('position.changed', { position });
+  }
+
+  getPosition() {
+    return this.state.position || null;
   }
 }
 

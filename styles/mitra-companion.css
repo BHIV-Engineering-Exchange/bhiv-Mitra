@@ -16,20 +16,29 @@
 
 #mitra-shell {
   position: fixed;
-  z-index: var(--mitra-z-index);
+  z-index: calc(var(--mitra-z-index) + 1);
   font-family: var(--mitra-font);
   color: var(--mitra-text);
   display: flex;
   flex-direction: column;
   gap: 16px;
-  pointer-events: none;
+  pointer-events: auto;
   transition: all var(--mitra-transition);
+}
+.mitra-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mitra-dock-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 1;
 }
 
 /* Docking Modes */
 #mitra-shell.floating {
-  bottom: 24px;
-  right: 24px;
   align-items: flex-end;
 }
 
@@ -148,7 +157,7 @@
   border: 1px solid var(--mitra-border);
   border-radius: var(--mitra-radius);
   box-shadow: var(--mitra-shadow);
-  display: flex;
+  display: none;
   flex-direction: column;
   overflow: hidden;
   pointer-events: auto;
@@ -160,6 +169,7 @@
 }
 
 .mitra-window.expanded {
+  display: flex;
   opacity: 1;
   transform: translateY(0) scale(1);
   visibility: visible;
@@ -193,12 +203,14 @@
 /* Dock Controls */
 .mitra-dock-controls {
   display: flex;
-  background: rgba(0,0,0,0.3);
-  border-radius: 8px;
-  padding: 2px;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 12px;
+  padding: 6px 8px;
 }
 .mitra-btn {
-  background: none; border: none; color: var(--mitra-text-muted);
+  background: none; border: none; color: var(--mitra-text);
   cursor: pointer; padding: 6px; border-radius: 6px;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
@@ -282,4 +294,37 @@
   #mitra-shell.floating { bottom: 16px; right: 16px; }
   .mitra-window { width: calc(100vw - 32px); height: calc(100vh - 100px); max-height: none; }
   #mitra-shell.docked-left .mitra-window, #mitra-shell.docked-right .mitra-window { width: 100vw; }
+}
+
+/* Custom Avatar and Drag Cursors */
+.mitra-avatar-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  pointer-events: none; /* Let clicks pass through to container */
+}
+
+.mitra-header {
+  cursor: grab;
+}
+
+.mitra-header:active {
+  cursor: grabbing;
+}
+
+.mitra-fab {
+  cursor: grab;
+  overflow: hidden; /* Constrain avatar element within boundary */
+}
+
+.mitra-fab:active {
+  cursor: grabbing;
+}
+
+.mitra-header-avatar {
+  border: 1px solid var(--mitra-border);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
 }

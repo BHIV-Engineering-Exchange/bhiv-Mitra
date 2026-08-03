@@ -46,7 +46,7 @@ Authentication is handled by the FastAPI backend.
 ### Prerequisites
 
 - Node.js 16+ and npm
-- Backend API running (default: http://localhost:8000)
+- Backend API running (default: https://mitra-backend-q1f3.onrender.com)
 
 ### Installation
 
@@ -62,7 +62,7 @@ cp .env.example .env
 
 Edit `.env`:
 ```
-REACT_APP_API_URL=http://localhost:8000
+REACT_APP_API_URL=https://mitra-backend-q1f3.onrender.com
 REACT_APP_API_KEY=your-api-key-here
 ```
 

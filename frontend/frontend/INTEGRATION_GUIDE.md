@@ -7,7 +7,7 @@ Ensure your backend is running:
 ```bash
 cd AI_ASSISTANT_Backend
 # Follow backend README to start the server
-# Default: http://localhost:8000
+# Default: https://mitra-backend-q1f3.onrender.com
 ```
 
 ### 2. Setup Frontend
@@ -21,13 +21,13 @@ npm start
 
 Create `.env` file (or edit existing):
 ```
-REACT_APP_API_URL=http://localhost:8000
+REACT_APP_API_URL=https://mitra-backend-q1f3.onrender.com
 REACT_APP_API_KEY=localtest
 ```
 
 Optional:
 ```
-REACT_APP_AUTH_API_URL=http://localhost:8000
+REACT_APP_AUTH_API_URL=https://mitra-backend-q1f3.onrender.com
 ```
 
 The merged architecture does not require a separate auth service URL.

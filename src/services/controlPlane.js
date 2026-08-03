@@ -1,6 +1,6 @@
 import { eventBus } from './eventBus.js';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'https://mitra-backend-q1f3.onrender.com';
 const API_KEY = 'bhiv-enterprise-key';
 
 export class ControlPlane {

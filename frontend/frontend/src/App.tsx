@@ -33,6 +33,48 @@ function AppContent() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'warning' | 'error' } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasScrolledRef = useRef(false);
+  const greetingInjectedRef = useRef(false);
+  const startupRanRef = useRef(false);
+
+  // On authentication: load session, memory, presence and capabilities.
+  // Session ID is stored in apiService so every sendMessage reuses the same session.
+  useEffect(() => {
+    if (!isAuthenticated || startupRanRef.current || !user?.id) return;
+    startupRanRef.current = true;
+
+    const runStartup = async () => {
+      try {
+        const [sessionRes] = await Promise.allSettled([
+          apiService.getSession(user.id),
+          apiService.getMemory(user.id),
+          apiService.getPresence(user.id),
+          apiService.getCapabilities(),
+        ]);
+        if (sessionRes.status === 'fulfilled' && sessionRes.value.session_id) {
+          apiService.setSessionId(sessionRes.value.session_id);
+        }
+      } catch {
+        // Non-fatal — chat still works without startup data.
+      }
+    };
+
+    runStartup();
+  }, [isAuthenticated, user?.id]);
+
+  // Heartbeat: keep presence alive every 60 seconds while the tab is open.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    const userId = user.id;
+    const intervalId = setInterval(() => {
+      apiService.sendHeartbeat(userId).catch(() => {});
+    }, 60000);
+    const handleUnload = () => clearInterval(intervalId);
+    window.addEventListener('beforeunload', handleUnload);
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  }, [isAuthenticated, user?.id]);
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = useCallback(() => {
@@ -80,6 +122,49 @@ function AppContent() {
     if (window.innerWidth < 1024) setIsSidebarOpen(false);
   }, []);
 
+  useEffect(() => {
+    if (!isAuthenticated || greetingInjectedRef.current || !user?.id) return;
+
+    const loadGreeting = async () => {
+      try {
+        const greetingResponse = await apiService.getGreeting(user.id);
+        const greetingText = greetingResponse?.greeting || 'Hello! How can I help you today?';
+
+        const greetingMessage: ConversationMessage = {
+          id: `greeting-${Date.now()}`,
+          userMessage: '',
+          assistantResponse: {
+            status: 'success',
+            data: {
+              intent: { intent: 'general', confidence: 1.0 },
+              enforcement: { decision: 'allow', reason: undefined, trace_id: undefined },
+              safety: { score: 1.0, confidence: 1.0, level: 'safe' },
+              decision: {
+                final_decision: 'response_generated',
+                response: greetingText,
+                task_created: undefined,
+              },
+              execution: { status: 'completed', stage: 'response_generation', error: undefined },
+              processed_at: new Date().toISOString(),
+            },
+          },
+          timestamp: new Date().toISOString(),
+          isLoading: false,
+        };
+
+        greetingInjectedRef.current = true;
+        setMessages(prev => {
+          if (prev.some(msg => msg.id === greetingMessage.id)) return prev;
+          return [greetingMessage, ...prev];
+        });
+      } catch (error) {
+        greetingInjectedRef.current = true;
+      }
+    };
+
+    loadGreeting();
+  }, [isAuthenticated, user?.id]);
+
   const handleSelectChat = useCallback((id: string) => {
     const convo = conversations.find(c => c.id === id);
     if (convo) {
@@ -126,7 +211,6 @@ function AppContent() {
 
     setMessages((prev) => [...prev, newMessage]);
     setIsLoading(true);
-    setToast({ message: 'Message sent', type: 'success' });
 
     try {
       const response = await apiService.sendMessage({

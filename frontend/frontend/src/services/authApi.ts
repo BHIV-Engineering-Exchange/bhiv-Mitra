@@ -1,5 +1,5 @@
 const getBaseUrl = () => {
-    const url = process.env.REACT_APP_API_URL || process.env.REACT_APP_AUTH_API_URL || 'http://localhost:8000';
+    const url = process.env.REACT_APP_API_URL || process.env.REACT_APP_AUTH_API_URL || 'https://mitra-backend-q1f3.onrender.com';
     if (url.startsWith('http')) return url;
     return `https://${url}`;
 };

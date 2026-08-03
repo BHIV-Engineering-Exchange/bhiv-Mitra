@@ -14,7 +14,7 @@ export class RuntimeService {
 
     try {
       const startTime = Date.now();
-      const res = await fetch('http://localhost:8000/health');
+      const res = await fetch('https://mitra-backend-q1f3.onrender.com/health');
       const duration = Date.now() - startTime;
 
       if (res.ok) {
@@ -36,7 +36,7 @@ export class RuntimeService {
     setInterval(async () => {
       try {
         const startTime = Date.now();
-        const res = await fetch('http://localhost:8000/health');
+        const res = await fetch('https://mitra-backend-q1f3.onrender.com/health');
         if (res.ok) {
           this.latency = `${Date.now() - startTime}ms`;
           if (this.status !== 'Busy') {
@@ -63,7 +63,7 @@ export class RuntimeService {
 
     try {
       if (capabilityName === 'health') {
-        const res = await fetch('http://localhost:8000/health/system');
+        const res = await fetch('https://mitra-backend-q1f3.onrender.com/health/system');
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const durationMs = Date.now() - startTime;
@@ -71,7 +71,7 @@ export class RuntimeService {
         contextStore.addReplay({ timestamp: new Date().toLocaleTimeString(), capability: capabilityName, status: 'SUCCESS', duration: `${durationMs}ms` });
         contextStore.addMessage('mitra', `System Health: ${JSON.stringify(data, null, 2)}`);
       } else if (capabilityName === 'settings') {
-        const res = await fetch('http://localhost:8000/api/metrics/system', {
+        const res = await fetch('https://mitra-backend-q1f3.onrender.com/api/metrics/system', {
           headers: {
             "X-API-Key": "bhiv-enterprise-key"
           }
@@ -86,7 +86,7 @@ export class RuntimeService {
         const replays = contextStore.getReplays();
         const lastReplay = replays[replays.length - 1];
         if (lastReplay && lastReplay.traceId) {
-          const res = await fetch(`http://localhost:8000/api/replay/${lastReplay.traceId}`, {
+          const res = await fetch(`https://mitra-backend-q1f3.onrender.com/api/replay/${lastReplay.traceId}`, {
             headers: {
               "X-API-Key": "bhiv-enterprise-key"
             }
